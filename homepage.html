@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-image: url('images/Floor.png'), url('images/Brick_Wall.png'), url('images/Light.png'); 
+            background-size: 110% auto, cover, 110% auto;
+            background-position: bottom, center, top left;
+            background-repeat: no-repeat, no-repeat, no-repeat;
+            background-attachment: scroll, scroll, scroll;
+            z-index: -1,-1,2;
+        }
+        .lesson-island {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%);
+            width: 500px;
+            height: 450px;
+            background-image: url('images/LessonIsland.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1;
+        }
+        .tune-station {
+            position: absolute;
+            bottom: 10%;
+            left: 5%;
+            width: 300px;
+            height: 300px;
+            background-image: url('images/TuneStation.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: left;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1;
+        }
+        .song-search {
+            position: absolute;
+            bottom: 10%;
+            right: 5%;
+            width: 300px;
+            height: 300px;
+            background-image: url('images/SongSearch.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1;
+        }
+        .profile {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            background-image: url('images/Profile.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1;
+        }
+        .impact {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 200px;
+            height: 200px;
+            background-image: url('images/Impact.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1;
+        }
+        .logo {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%);
+            width: 600px;
+            height: 200px;
+            background-image: url('images/Title.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+        }  
+        .lesson-island:hover,
+        .tune-station:hover,
+        .song-search:hover,
+        .profile:hover,
+        .impact:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+            transition: all 0.3s ease;
+        }
+        .lesson-island {
+            transform: translate(-50%);
+            transform-origin: center bottom;
+        }
+
+        .lesson-island:hover {
+            transform: translate(-50%) scale(1.025);
+        }
+
+        .floating-symbols {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .musical-symbol {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 2rem;
+            animation: float 15s linear infinite;
+            user-select: none;
+        }
+        .musical-symbol:nth-child(odd) {
+            color: rgba(76, 26, 128, 0.7);
+        }
+        .musical-symbol:nth-child(3n) {
+            color: rgba(0, 61, 77, 0.6);
+        }
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .pulse {
+            animation: float 15s linear infinite, pulse 3s ease-in-out infinite;
+        }
+        .glow {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #281e66, hsl(248, 54%, 36%));
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-symbol {
+            font-size: 4rem;
+            color: #ef09d0; 
+            animation: spin 2s linear infinite;
+            text-shadow: 0 0 20px #ef09d0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-symbol">♪</div>
+    </div>
+
+    <div class="logo"></div>
+    <div class="lesson-island"></div>
+    <div class="tune-station"></div>
+    <div class="song-search"></div>
+    <div class="profile"></div>
+    <div class="impact"></div>
+
+    <div id="floating-symbols" class="floating-symbols"></div>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('pageLoader').classList.add('hidden');
+            }, 1000);
+        });
+        
+        const symbols = ['♪', '♫', '♬', '♭', '♯', '♩', '♨', '♮', '𝄞', '𝄢', '𝄡', '𝄽', '𝄾', '𝄿', '𝅀', '𝅁', '𝅂'];
+        const container = document.getElementById('floating-symbols');
+
+        function createSymbol() {
+            const symbol = document.createElement('div');
+            symbol.className = 'musical-symbol';
+            if (Math.random() < 0.3) symbol.classList.add('pulse');
+            if (Math.random() < 0.2) symbol.classList.add('glow');
+            symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            symbol.style.left = Math.random() * 100 + '%';
+            symbol.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+            symbol.style.animationDelay = Math.random() * 5 + 's';
+            symbol.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            container.appendChild(symbol);
+            setTimeout(() => {
+                if (symbol.parentNode) {
+                    symbol.parentNode.removeChild(symbol);
+                }
+            }, 20000);
+        }
+
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => createSymbol(), i * 500);
+        }
+
+        setInterval(createSymbol, 2000);
+
+        document.addEventListener('mousemove', (e) => {
+            const symbols = document.querySelectorAll('.musical-symbol');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            symbols.forEach((symbol, index) => {
+                const speed = (index % 3 + 1) * 0.5;
+                const x = (mouseX - 0.5) * speed;
+                const y = (mouseY - 0.5) * speed;
+                symbol.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

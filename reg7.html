@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Tunes - Registration 6</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-purple: #d49efb;
+      --accent-yellow: #fceabb;
+      --dark-purple: #4c1a80;
+      --teal: #003d4d;
+      --dark-bg: #0a0f0f;
+      --white: #ffffff;
+      --light-gray: #cccccc;
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      --shadow-light: rgba(0, 0, 0, 0.2);
+      --border-radius: 20px;
+      --border-width: 2.5px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, var(--dark-bg), var(--dark-purple), var(--teal));
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      font-family: 'Poppins', sans-serif;
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150%;
+      height: 270%;
+      background-image: url('images/Brick_Wall.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      25% { background-position: 100% 50%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes musicNote {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-10px) rotate(5deg); }
+      75% { transform: translateY(5px) rotate(-3deg); }
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 15, 15, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      animation: slideInUp 0.8s ease;
+    }
+
+    nav .logo-text {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow));
+      transition: width 0.3s ease;
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+    nav ul li a:hover {
+      color: var(--primary-purple);
+    }
+
+    .progress-bar {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 999;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow));
+      width: 60%;
+      transition: width 0.5s ease;
+      animation: slideInUp 1s ease 0.5s both;
+    }
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10rem 2rem 2rem;
+    }
+
+    .registration-card {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 1000px;
+      box-shadow: 0 20px 60px var(--shadow-dark);
+      animation: scaleIn 0.8s ease 0.2s both;
+    }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .character-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .pickbot-image {
+      max-width: 200px;
+      height: auto;
+      transition: transform 0.5s ease;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+      animation: scaleIn 0.8s ease 0.4s both;
+    }
+
+    .pickbot-image:hover {
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    .speech-bubble {
+      background: linear-gradient(135deg, var(--primary-purple), #e8c5ff);
+      color: #2d1b3d;
+      border: var(--border-width) solid #2d1b3d;
+      border-radius: 25px;
+      padding: 1.5rem 2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      position: relative;
+      margin: 2rem auto;
+      max-width: 650px;
+      text-align: center;
+      box-shadow: 0 8px 25px var(--shadow-light);
+      animation: slideInUp 0.8s ease 0.6s both;
+      line-height: 1.3;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 15px solid transparent;
+      border-top: 15px solid var(--primary-purple);
+      transform: translateX(-50%);
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+    }
+
+    .question-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      color: var(--white);
+      animation: slideInUp 0.8s ease 0.8s both;
+    }
+
+    .music-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .music-option {
+      position: relative;
+      animation: slideInUp 0.6s ease both;
+    }
+
+    .music-option:nth-child(1) { animation-delay: 1.0s; }
+    .music-option:nth-child(2) { animation-delay: 1.1s; }
+    .music-option:nth-child(3) { animation-delay: 1.2s; }
+    .music-option:nth-child(4) { animation-delay: 1.3s; }
+    .music-option:nth-child(5) { animation-delay: 1.4s; }
+    .music-option:nth-child(6) { animation-delay: 1.5s; }
+
+    .music-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .music-label {
+      display: block;
+      background: linear-gradient(135deg, rgba(212, 158, 251, 0.9), rgba(212, 158, 251, 0.7));
+      color: #2d1b3d;
+      border: var(--border-width) solid transparent;
+      border-radius: var(--border-radius);
+      padding: 1.8rem 2rem;
+      font-size: 1.3rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 15px var(--shadow-light);
+      text-align: center;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    .music-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      animation: musicNote 4s ease-in-out infinite;
+    }
+
+    .music-label .genre-name {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .music-label .genre-desc {
+      font-size: 1rem;
+      opacity: 0.8;
+      font-weight: 400;
+    }
+
+    .music-label::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--primary-purple), var(--accent-yellow));
+      border-radius: var(--border-radius);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .music-label:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px var(--shadow-dark);
+    }
+
+    .music-label:hover::before {
+      opacity: 1;
+    }
+
+    .music-label:hover .music-icon {
+      animation-duration: 2s;
+    }
+
+    .music-option input[type="radio"]:checked + .music-label {
+      background: linear-gradient(135deg, var(--accent-yellow), #fff3a0);
+      border-color: #2d1b3d;
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px var(--shadow-dark);
+    }
+
+    .music-option input[type="radio"]:checked + .music-label::before {
+      opacity: 0;
+    }
+
+    .music-option input[type="radio"]:checked + .music-label .music-icon {
+      animation-duration: 1s;
+      transform: scale(1.1);
+    }
+
+    .continue-section {
+      text-align: center;
+      animation: slideInUp 0.8s ease 1.6s both;
+    }
+
+    .continue-btn {
+      background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+      color: var(--white);
+      border: var(--border-width) solid var(--white);
+      border-radius: var(--border-radius);
+      padding: 1.2rem 3rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      box-shadow: 0 8px 25px var(--shadow-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .continue-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .continue-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px var(--shadow-dark);
+    }
+
+    .continue-btn:hover::before {
+      left: 100%;
+    }
+
+    .continue-btn:disabled {
+      opacity: 0.6;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--light-gray);
+      font-size: 0.95rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      animation: slideInUp 0.8s ease 1.8s both;
+    }
+
+    footer a {
+      color: var(--light-gray);
+      text-decoration: none;
+      margin: 0 0.5rem;
+      transition: var(--transition);
+    }
+
+    footer a:hover {
+      color: var(--primary-purple);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem 1.5rem;
+      }
+
+      nav .logo-text {
+        font-size: 1.8rem;
+      }
+
+      nav ul {
+        gap: 1rem;
+      }
+
+      nav ul li a {
+        font-size: 1rem;
+      }
+
+      .main-container {
+        padding: 9rem 1rem 1rem;
+      }
+
+      .registration-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .speech-bubble {
+        font-size: 1.3rem;
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem auto;
+      }
+
+      .pickbot-image {
+        max-width: 160px;
+      }
+
+      .question-title {
+        font-size: 1.5rem;
+      }
+
+      .music-options {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+      }
+
+      .music-label {
+        font-size: 1.2rem;
+        padding: 1.5rem 1.5rem;
+        min-height: 120px;
+      }
+
+      .music-icon {
+        font-size: 2.5rem;
+      }
+
+      .music-label .genre-name {
+        font-size: 1.3rem;
+      }
+
+      .continue-btn {
+        font-size: 1.2rem;
+        padding: 1rem 2.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      nav ul {
+        display: none;
+      }
+
+      .speech-bubble {
+        font-size: 1.1rem;
+      }
+
+      .question-title {
+        font-size: 1.3rem;
+      }
+
+      .music-label {
+        font-size: 1.1rem;
+      }
+
+      .music-icon {
+        font-size: 2.2rem;
+      }
+
+      .music-label .genre-name {
+        font-size: 1.2rem;
+      }
+
+      .music-label .genre-desc {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo-text">Tech Tunes</div>
+    <ul>
+      <li><a href="#">Features</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="progress-bar">
+    <div class="progress-fill"></div>
+  </div>
+
+  <main class="main-container">
+    <div class="registration-card">
+      <div class="header-section">
+        <div class="character-container">
+          <img src="images/PickbotTrans.png" alt="PickBot" class="pickbot-image"/>
+        </div>
+        <div class="speech-bubble">
+          ONE LAST THING - WHAT MUSIC DO YOU LOVE MOST?
+        </div>
+      </div>
+
+      <h2 class="question-title">Choose your favorite music genre:</h2>
+
+      <div class="music-options">
+        <div class="music-option">
+          <input type="radio" name="musicGenre" value="rock" id="rock"/>
+          <label for="rock" class="music-label">
+            <div class="music-icon">🎸</div>
+            <div class="genre-name">Rock</div>
+            <div class="genre-desc">Classic & Modern</div>
+          </label>
+        </div>
+        
+        <div class="music-option">
+          <input type="radio" name="musicGenre" value="pop" id="pop"/>
+          <label for="pop" class="music-label">
+            <div class="music-icon">🎤</div>
+            <div class="genre-name">Pop</div>
+            <div class="genre-desc">Chart Toppers</div>
+          </label>
+        </div>
+        
+        <div class="music-option">
+          <input type="radio" name="musicGenre" value="rnb" id="rnb"/>
+          <label for="rnb" class="music-label">
+            <div class="music-icon">🎵</div>
+            <div class="genre-name">R&B / Soul</div>
+            <div class="genre-desc">Smooth Grooves</div>
+          </label>
+        </div>
+        
+        <div class="music-option">
+          <input type="radio" name="musicGenre" value="indie" id="indie"/>
+          <label for="indie" class="music-label">
+            <div class="music-icon">🎶</div>
+            <div class="genre-name">Indie / Folk</div>
+            <div class="genre-desc">Alternative Vibes</div>
+          </label>
+        </div>
+        
+        <div class="music-option">
+          <input type="radio" name="musicGenre" value="country" id="country"/>
+          <label for="country" class="music-label">
+            <div class="music-icon">🤠</div>
+            <div class="genre-name">Country</div>
+            <div class="genre-desc">Stories & Heart</div>
+          </label>
+        </div>
+        
+        <div class="music-option">
+          <input type="radio" name="musicGenre" value="everything" id="everything"/>
+          <label for="everything" class="music-label">
+            <div class="music-icon">🌟</div>
+            <div class="genre-name">A Mix of Everything</div>
+            <div class="genre-desc">All Genres</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="continue-section">
+        <button class="continue-btn" onclick="window.location.href='reg8.html'" disabled>Finish</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Tech Tunes ·
+    <a href="#">Terms</a> |
+    <a href="#">Privacy</a> |
+    <a href="#">Contact</a>
+  </footer>
+
+  <script>
+    // Add interaction feedback for music labels
+    document.querySelectorAll('.music-label').forEach(label => {
+      label.addEventListener('click', function() {
+        // Add a subtle success animation
+        this.style.transform = 'scale(0.95) translateY(-8px)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+      });
+    });
+
+    // Enable continue button when an option is selected
+    const continueBtn = document.querySelector('.continue-btn');
+    const radioButtons = document.querySelectorAll('input[name="musicGenre"]');
+    
+    radioButtons.forEach(radio => {
+      radio.addEventListener('change', () => {
+        continueBtn.disabled = false;
+        continueBtn.style.opacity = '1';
+        continueBtn.style.pointerEvents = 'auto';
+        
+        // Add a musical glow effect to the continue button
+        continueBtn.style.boxShadow = '0 8px 25px rgba(212, 158, 251, 0.4)';
+        
+        // Change button text based on selection
+        continueBtn.textContent = 'Finish';
+      });
+    });
+
+    // Add PickBot personality with music-themed movements
+    const pickbotImage = document.querySelector('.pickbot-image');
+    let danceMove = 0;
+    
+    setInterval(() => {
+      const moves = [
+        'rotate(3deg) scale(1.02)',
+        'rotate(-2deg) scale(0.98)',
+        'rotate(1deg) translateY(-3px)',
+        'rotate(-1deg) translateY(2px)'
+      ];
+      
+      pickbotImage.style.transform = moves[danceMove % moves.length];
+      danceMove++;
+    }, 2000);
+
+    // Add staggered animation delays to music icons
+    document.querySelectorAll('.music-icon').forEach((icon, index) => {
+      icon.style.animationDelay = `${index * 0.3}s`;
+    });
+
+    // Add sound effect simulation on hover (visual feedback)
+    document.querySelectorAll('.music-label').forEach(label => {
+      label.addEventListener('mouseenter', function() {
+        const icon = this.querySelector('.music-icon');
+        icon.style.transform = 'scale(1.2) rotate(10deg)';
+        
+        setTimeout(() => {
+          icon.style.transform = '';
+        }, 200);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Tunes - Choose Your Plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-purple: #d49efb;
+      --accent-yellow: #fceabb;
+      --dark-purple: #4c1a80;
+      --teal: #003d4d;
+      --dark-bg: #0a0f0f;
+      --white: #ffffff;
+      --light-gray: #cccccc;
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      --shadow-light: rgba(0, 0, 0, 0.2);
+      --border-radius: 20px;
+      --border-width: 2.5px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, var(--dark-bg), var(--dark-purple), var(--teal));
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      font-family: 'Poppins', sans-serif;
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150%;
+      height: 225%;
+      background-image: url('images/Brick_Wall.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      25% { background-position: 100% 50%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 15, 15, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      animation: slideInUp 0.8s ease;
+    }
+
+    nav .logo-text {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow));
+      transition: width 0.3s ease;
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+    nav ul li a:hover {
+      color: var(--primary-purple);
+    }
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10rem 2rem 2rem;
+    }
+
+    .pricing-card {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 900px;
+      box-shadow: 0 20px 60px var(--shadow-dark);
+      animation: scaleIn 0.8s ease 0.2s both;
+    }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .pickbot-image {
+      max-width: 160px;
+      height: auto;
+      margin-bottom: 2rem;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    }
+
+    .speech-bubble {
+      background: linear-gradient(135deg, var(--primary-purple), #e8c5ff);
+      color: #2d1b3d;
+      border: var(--border-width) solid #2d1b3d;
+      border-radius: 25px;
+      padding: 1.5rem 2rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+      position: relative;
+      margin: 2rem auto;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 8px 25px var(--shadow-light);
+      animation: slideInUp 0.8s ease 0.6s both;
+      line-height: 1.4;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 15px solid transparent;
+      border-top: 15px solid var(--primary-purple);
+      transform: translateX(-50%);
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+    }
+
+    .pricing-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .plan-card {
+      background: linear-gradient(135deg, rgba(212, 158, 251, 0.9), rgba(212, 158, 251, 0.7));
+      color: #2d1b3d;
+      border: var(--border-width) solid transparent;
+      border-radius: var(--border-radius);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px var(--shadow-light);
+      animation: slideInUp 0.6s ease both;
+    }
+
+    .plan-card:nth-child(1) { animation-delay: 1.0s; }
+    .plan-card:nth-child(2) { animation-delay: 1.2s; }
+
+    .premium-card {
+      background: linear-gradient(135deg, var(--accent-yellow), #fff3a0);
+      border: var(--border-width) solid var(--dark-purple);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .premium-card::before {
+      content: '⭐ RECOMMENDED';
+      position: absolute;
+      top: 35px;
+      right: -30px;
+      background: var(--dark-purple);
+      color: var(--white);
+      padding: 5px 40px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transform: rotate(45deg);
+      box-shadow: 0 2px 10px var(--shadow-dark);
+    }
+
+    .plan-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .plan-description {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem 0;
+    }
+
+    .plan-features li {
+      padding: 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: #2d1b3d;
+      font-weight: bold;
+      margin-right: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .plan-button {
+      background: linear-gradient(135deg, var(--dark-purple), var(--primary-purple));
+      color: var(--white);
+      border: none;
+      border-radius: 15px;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .plan-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .plan-button:hover::before {
+      left: 100%;
+    }
+
+    .plan-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px var(--shadow-dark);
+    }
+
+    .plan-card:hover .plan-button {
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--light-gray);
+      font-size: 0.95rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      animation: slideInUp 0.8s ease 1.6s both;
+    }
+
+    footer a {
+      color: var(--light-gray);
+      text-decoration: none;
+      margin: 0 0.5rem;
+      transition: var(--transition);
+    }
+
+    footer a:hover {
+      color: var(--primary-purple);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem 1.5rem;
+      }
+
+      nav .logo-text {
+        font-size: 1.8rem;
+      }
+
+      nav ul {
+        gap: 1rem;
+      }
+
+      nav ul li a {
+        font-size: 1rem;
+      }
+
+      .main-container {
+        padding: 9rem 1rem 1rem;
+      }
+
+      .pricing-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .pricing-options {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .speech-bubble {
+        font-size: 1.1rem;
+        padding: 1.2rem 1.5rem;
+      }
+
+      .pickbot-image {
+        max-width: 120px;
+      }
+
+      .plan-title {
+        font-size: 1.7rem;
+      }
+
+      .plan-description {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      nav ul {
+        display: none;
+      }
+
+      .plan-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .plan-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo-text">Tech Tunes</div>
+    <ul>
+      <li><a href="#">Features</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </nav>
+
+  <main class="main-container">
+    <div class="pricing-card">
+      <div class="header-section">
+        <img src="images/PickbotTrans.png" alt="PickBot" class="pickbot-image"/>
+        <div class="speech-bubble">
+          Free gets you started.<br>
+          Premium gives you everything - lessons, songs, and impact!
+        </div>
+      </div>
+
+      <div class="pricing-options">
+        <div class="plan-card">
+          <div class="plan-title">Freemium</div>
+          <div class="plan-description">Perfect to get started on your musical journey</div>
+          <ul class="plan-features">
+            <li>Basic guitar lessons</li>
+            <li>Limited song library</li>
+            <li>Limited Community access</li>
+            <li>Progress tracking</li>
+          </ul>
+          <button class="plan-button" onclick="window.location.href='homepage.html'">Start Free</button>
+        </div>
+
+        <div class="plan-card premium-card">
+          <div class="plan-title">Play it Forward Premium</div>
+          <div class="plan-description">Everything you need plus exclusive features and content</div>
+          <ul class="plan-features">
+            <li>All premium lessons & courses</li>
+            <li>Complete song library</li>
+            <li>Personal AI instructor</li>
+            <li>Priority support</li>
+            <li>Select your school; See your real time impact!</li>
+          </ul>
+          <button class="plan-button" onclick="window.location.href='homepage.html'">Go Premium</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Tech Tunes ·
+    <a href="#">Terms</a> |
+    <a href="#">Privacy</a> |
+    <a href="#">Contact</a>
+  </footer>
+
+  <script>
+    // Add interactive effects
+    document.querySelectorAll('.plan-card').forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-10px) scale(1.02)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+      });
+    });
+
+    // Add PickBot personality
+    const pickbot = document.querySelector('.pickbot-image');
+    let floatDirection = 1;
+    
+    setInterval(() => {
+      pickbot.style.transform = `translateY(${floatDirection * 5}px) rotate(${floatDirection * 2}deg)`;
+      floatDirection *= -1;
+    }, 2000);
+
+    // Add plan button interactions
+    document.querySelectorAll('.plan-button').forEach(button => {
+      button.addEventListener('click', function() {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = 'scale(1)';
+        }, 150);
+      });
+    });
+
+    // Add subtle animation to premium badge
+    const premiumCard = document.querySelector('.premium-card');
+    if (premiumCard) {
+      setInterval(() => {
+        premiumCard.style.boxShadow = '0 8px 25px rgba(212, 158, 251, 0.4)';
+        setTimeout(() => {
+          premiumCard.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.2)';
+        }, 1000);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
