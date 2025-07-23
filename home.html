@@ -5,6 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tech Tunes - Registration 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mousetrail.css">
+<link rel="stylesheet" href="css/pickbot.css">
+
+  <nav class="main-nav">
+    <a href="/index.html">Home</a> |
+    <a href="/profile.html">Profile</a>
+  </nav>
+  <nav>
+    <ul id="main-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="login.html" id="nav-login">Login</a></li>
+      <li><a href="profile.html" id="nav-profile">Profile</a></li>
+      <li><a href="#" id="nav-logout" style="display:none">Logout</a></li>
+    </ul>
+  </nav>
+  
+  
+
   <style>
     :root {
       --primary-purple: #d49efb;
@@ -546,7 +564,7 @@
       <div class="tagline">Guitar lessons that give back</div>
       <div class="subheading">Learn to play while making a difference in your community</div>
       <div class="button-group">
-        <a href="reg1.html" class="button">Get Started</a>
+        <a href="login.html?next=reg1.html" class="button">Get Started</a>
         <a href="login.html" class="button secondary">Already have an account?</a>
       </div>
     </div>
@@ -558,6 +576,10 @@
     <a href="#">Privacy</a> |
     <a href="#">Contact</a>
   </footer>
+  <script src="js/mousetrail.js"></script>
+  <script src="js/pickbot.js"></script>
+  
+
 
 </body>
 </html>

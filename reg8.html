@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tech Tunes - Loading</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mousetrail.css">
+  <link rel="stylesheet" href="css/pickbot.css">
+  
+  
+  <nav class="main-nav">
+    <a href="home.html">Home</a> |
+    <a href="profile.html">Profile</a>
+  </nav>
+  
   <style>
     :root {
       --primary-purple: #d49efb;
@@ -52,6 +61,37 @@
       opacity: 0.3;
       z-index: 0;
     }
+    /* ─── pickbot wrapper ─── */
+.pickbot-character {
+  position: relative;
+  display: inline-block; /* so the arms position to the img */
+}
+
+.pickbot-character img.pickbot-image {
+  display: block;
+}
+
+/* ─── arms styling ─── */
+.pickbot-arm {
+  position: absolute;
+  width: 60px;      /* tweak to match your hand-png size */
+  height: 80px;     /* tweak as needed */
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.pickbot-arm.left {
+  top: 50%;                    /* vertically centered */
+  left: -30px;                 /* stick out to the left */
+  transform: translateY(-50%);
+  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
+}
+.pickbot-arm.right {
+  top: 50%;
+  right: -30px;                /* stick out to the right */
+  transform: translateY(-50%) scaleX(-1); /* flip horizontally */
+  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
+}
+
 
     @keyframes gradientShift {
       0%, 100% { background-position: 0% 50%; }
@@ -275,7 +315,7 @@
       <div class="dot"></div>
     </div>
 
-    <button class="continue-btn" onclick="window.location.href='pricing.html'">Continue</button>
+    <button class="continue-btn" onclick="window.location.href='homepage.html'">Continue</button>
   </div>
 
   <script>
@@ -317,5 +357,8 @@
       document.querySelector('.continue-btn').style.display = 'inline-block';
     }, 3000);
   </script>
+  <script src="js/mousetrail.js"></script>
+  <script src="js/pickbot.js"></script>
+
 </body>
 </html>

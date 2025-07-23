@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Tunes • Profile</title>
+
+  <!-- Utility CSS -->
+  <link rel="stylesheet" href="css/mousetrail.css">
+  <!-- Page CSS -->
+  <link rel="stylesheet" href="css/profile.css">
+
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Anime.js for avatar animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <!-- Auth (inject avatar into nav globally) -->
+  <script defer src="js/auth.js"></script>
+  <!-- Profile logic -->
+  <script defer src="js/profile.js"></script>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <ul>
+      <li><a href="homepage.html">Home</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li id="nav-profile"><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- Profile Card -->
+  <main id="profile-container">
+    <h1>Your Profile</h1>
+    <form id="profile-form">
+      <label for="profile-name">Your Name:</label>
+      <input type="text" id="profile-name" placeholder="Enter your name" required>
+
+      <label for="favorite-instrument">Favorite Instrument:</label>
+      <select id="favorite-instrument">
+        <option value="">— Select —</option>
+        <option>Guitar</option>
+        <option>Piano</option>
+        <option>Drums</option>
+        <option>Violin</option>
+        <option>Saxophone</option>
+      </select>
+
+      <label for="avatar-color">Avatar Color:</label>
+      <input type="color" id="avatar-color" value="#d49efb">
+
+      <button type="submit">Save Profile</button>
+    </form>
+
+    <!-- Link to full-page avatar editor -->
+    <a href="avatar.html" id="edit-avatar-btn" class="btn">Customize Your Avatar</a>
+
+    <!-- Avatar preview -->
+    <div id="avatar-preview-container" style="margin-top:1.5rem; text-align:center;">
+      <h3>Your Avatar</h3>
+      <img
+        id="avatar-preview"
+        alt="Your avatar"
+        style="max-width:200px; border:2px solid #fff; display:block; margin:0 auto;"
+      />
+    </div>
+  </main>
+
+  <!-- Mousetrail Utility -->
+  <script src="js/mousetrail.js"></script>
+
+  <!-- load saved avatar if it exists -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = localStorage.getItem('savedAvatar');
+      if (data) {
+        document.getElementById('avatar-preview').src = data;
+      }
+    });
+  </script>
+</body>
+</html>

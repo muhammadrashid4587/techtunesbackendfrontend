@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tech Tunes - Registration 1</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mousetrail.css">
+  <link rel="stylesheet" href="css/pickbot.css">
+  
+  
+  <nav class="main-nav">
+    <a href="index.html">Home</a> |
+    <a href="profile.html">Profile</a>
+  </nav>
+  
   <style>
     :root {
       --primary-purple: #d49efb;
@@ -355,6 +364,37 @@
         font-size: 1.2rem;
         padding: 1.2rem 1.5rem;
       }
+      /* ─── pickbot wrapper ─── */
+.pickbot-character {
+  position: relative;
+  display: inline-block; /* so the arms position to the img */
+}
+
+.pickbot-character img.pickbot-image {
+  display: block;
+}
+
+/* ─── arms styling ─── */
+.pickbot-arm {
+  position: absolute;
+  width: 60px;      /* tweak to match your hand-png size */
+  height: 80px;     /* tweak as needed */
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.pickbot-arm.left {
+  top: 50%;                    /* vertically centered */
+  left: -30px;                 /* stick out to the left */
+  transform: translateY(-50%);
+  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
+}
+.pickbot-arm.right {
+  top: 50%;
+  right: -30px;                /* stick out to the right */
+  transform: translateY(-50%) scaleX(-1); /* flip horizontally */
+  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
+}
+
     }
   </style>
 </head>
@@ -396,5 +436,9 @@
     <a href="#">Privacy</a> |
     <a href="#">Contact</a>
   </footer>
+  <script src="js/mousetrail.js"></script>
+  <script src="js/pickbot.js"></script>
+
+
 </body>
 </html>

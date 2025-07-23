@@ -1,0 +1,110 @@
+/* ─── pickbot.css ─── */
+
+/* wrapper around your <img> */
+.pickbot-character {
+    position: relative;
+    display: inline-block;
+    pointer-events: none !important;
+    animation: popIn 0.8s ease 0.4s both;
+    
+  }
+  
+  /* make sure the image itself doesn’t collapse */
+  .pickbot-character .pickbot-image {
+    display: block;
+  }
+  
+  /* ─── ARMS ─── */
+  .pickbot-arm {
+    position: absolute;
+    width: 205px;    /* tweak to fit your art */
+    height: 590px;   /* tweak to fit your art */
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0;
+    animation: scaleIn 0.3s ease 0.344s both;
+  }
+  .pickbot-arm.left {
+    top: 34%;            /* vertical offset */
+    left: 1px;         /* pull out to the left */
+    transform: translateY(510%);
+    background-image: url("../images/Choice Elements/Hands/Base Hands@4x.png");
+  }
+  .pickbot-arm.right {
+    top: 30%;
+    right: -25px;        /* pull out to the right */
+    transform: translateY(-50%) scaleX(-1);
+    background-image: url("../images/Choice Elements/Hands/Base Hands@4x.png");
+  }
+  /* hide the right pickbot arm */
+.pickbot-arm.right {
+    display: none !important;
+  }
+  
+  
+
+  
+
+  /* ─── LEGS ─── */
+.pickbot-leg {
+  position: absolute;
+  bottom: 0;           /* anchor at the bottom of wrapper */
+  width: 120px;        /* tweak to match your legs art */
+  height: 100px;       /* tweak to match your legs art */
+  background-size: contain;
+  background-repeat: no-repeat;
+
+  transform-origin: center bottom;
+  transform: translateX(-50%) scale(0);
+  opacity: 0;
+  animation: popIn 0.8s ease 0.4s both;
+}
+.pickbot-leg.left {
+  left: 35%;  /* adjust until left leg sits under left foot */
+  background-image: url("/Users/muhammadrashid/Desktop/Mammu/Mammu/TechnoTunes/TechTunes/Pickbot- Translucent Ideas/Pickbot Translucent No face, No Arms.png");
+}
+.pickbot-leg.right {
+  left: 65%;  /* adjust until right leg sits under right foot */
+  transform: translateX(-50%) scaleX(-1) scale(0);
+  background-image: url("/Users/muhammadrashid/Desktop/Mammu/Mammu/TechnoTunes/TechTunes/Pickbot- Translucent Ideas/Pickbot Translucent No face, No Arms.png");
+}
+
+
+/* ─── pop-in keyframes (for both arms & legs) ─── */
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ─── Base leg container ─── */
+.pickbot-leg {
+  position: absolute;
+  bottom: 0;                    /* anchor at the wrapper’s bottom edge */
+  width: 80px;                  /* match your left.png/right.png pixel size */
+  height: 120px;                /* match your left.png/right.png pixel size */
+  background-size: contain;
+  background-repeat: no-repeat;
+  
+  /* start shrunk and hidden, centered horizontally */
+  transform-origin: center bottom;
+  transform: translateX(-50%) scale(0);
+  opacity: 0;
+  animation: popIn 0.3s ease 0.2s both;
+}
+
+/* ─── left leg under left foot ─── */
+.pickbot-leg.left {
+  left: 34%;
+  width: 30px;                  /* match your left.png/right.png pixel size */
+  height: 150px;                      /* tweak % until it sits under left shoe */
+  background-image: url("../images/left.png");
+}
+
+/* ─── right leg under right foot ─── */
+.pickbot-leg.right {
+  left: 61%;
+  width: 30px;                  /* match your left.png/right.png pixel size */
+  height: 150px;                      /* tweak % until it sits under left shoe */
+                      /* tweak % until it sits under right shoe */
+  background-image: url("../images/right.png");
+}

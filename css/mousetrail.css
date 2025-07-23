@@ -1,0 +1,31 @@
+/* css/mousetrail.css */
+
+:root {
+    --note-start: #3498db;   /* your brand/accent */
+  }
+  
+  .music-note {
+    position: absolute;
+    pointer-events: none;
+    font-size: 34px;
+    font-weight: bold;
+    color: var(--note-start);
+    user-select: none;
+    animation: float-up 0.5s forwards;
+  }
+  
+  @keyframes float-up {
+    to {
+      transform: translateY(-20px);
+      opacity: 0;
+      /* fade color into the page background */
+      color: var(--page-bg);
+    }
+  }
+  
+  
+  /* Change the cursor style site-wide */
+  body {
+    cursor: pointer;       /* you can also try crosshair, grab, move, etc. */
+  }
+  

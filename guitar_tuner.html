@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guitar Tuner - TechTunes</title>
+    <link rel="stylesheet" href="css/mousetrail.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a1f;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .brick-wall {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('images/Brick_Wall.png') repeat;
+            background-size: 200px 100px;
+            z-index: 1;
+            filter: brightness(0.5) saturate(0.8);
+        }
+
+        .tuner-container {
+            position: relative;
+            width: 100vw;
+            height: 117vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .home-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .home-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-label {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 70px;
+            height: 35px;
+            background: #333;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch.active {
+            background: #00d4ff;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 29px;
+            height: 29px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(35px);
+        }
+
+        .sound-meter {
+            position: absolute;
+            top: 100px;
+            width: 450px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .string-meter {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .string-meter.active {
+            display: flex;
+        }
+
+        .meter-image {
+            width: 400px;
+            height: auto;
+            position: relative;
+        }
+
+        .meter-arrow {
+            position: absolute;
+            width: 70px;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            transform-origin: center bottom;
+        }
+
+        .guitar-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 650px;
+        }
+
+        .guitar-headstock {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+        }
+
+        .headstock-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('images/Tuner_Page_Assets/Guitar Head@4x.png') no-repeat center;
+            background-size: contain;
+            z-index: 1;
+        }
+
+        .guitar-strings {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* String overlay images - these will be the pre-made highlighted string images */
+        .guitar-string {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .guitar-string.active {
+            opacity: 1;
+        }
+
+        /* Use the actual string images from the directory */
+        .string-e-low {
+            background-image: url('images/Tuner_Page_Assets/Strings/E Left String Clicked@4x.png');
+            top: 165px; 
+            right: 50px;
+            left: 95px;
+            width: 94px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .string-a {
+            background-image: url('images/Tuner_Page_Assets/Strings/A String Clicked@4x.png');
+            top: 110px; 
+            right: 50px;
+            left: 120px;
+            width: 94px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .string-d {
+            background-image: url('images/Tuner_Page_Assets/Strings/D String Clicked@4x.png');
+            top: 43px; 
+            right: 50px;
+            left: 135px;
+            width: 100px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .string-g {
+            background-image: url('images/Tuner_Page_Assets/Strings/G String Clicked@4x.png');
+            top: 43px; 
+            right: -10px;
+            left: 214px;
+            width: 100px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .string-b {
+            background-image: url('images/Tuner_Page_Assets/Strings/B String Clicked@4x.png');
+            top: 103px; 
+            right: -220px;
+            left: 235px;
+            width: 90px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .string-e-high {
+            background-image: url('images/Tuner_Page_Assets/Strings/E Right String Clicked@4x.png');
+            top: 163px; 
+            right: -250px;
+            left: 260px;
+            width: 90px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* String letter overlays on the headstock */
+        .string-letters {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+        }
+
+        .string-letter {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .string-letter:hover {
+            transform: scale(1.1);
+            opacity: 1 !important;
+        }
+
+        .string-letter.active {
+            opacity: 1;
+            background: currentColor !important;
+            box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+        }
+
+        /* Position letters on the headstock - opposite side of tuning pegs */
+        .letter-e-low { 
+            top: 395px; 
+            left: -80px; 
+            border-color: #b65994 ;
+            color: #b65994 ;
+            opacity: 0.3;
+        }
+        
+        .letter-a { 
+            top: 280px; 
+            left: -45px; 
+            border-color: #4a12f3;
+            color: #1212f3;
+            opacity: 0.3;
+        }
+        
+        .letter-d { 
+            top: 168px; 
+            left: -15px; 
+            border-color: #f1840f;
+            color: #f1840f;
+            opacity: 0.3;
+        }
+        
+        .letter-g { 
+            top: 168px; 
+            right: -35px; 
+            border-color: #2ebccc ;
+            color: #2ebccc ;
+            opacity: 0.3;
+        }
+        
+        .letter-b { 
+            top: 280px; 
+            right: -59px; 
+            border-color: #c239ef;
+            color: #c239ef;
+            opacity: 0.3;
+        }
+        
+        .letter-e-high { 
+            top: 400px; 
+            right: -85px; 
+            border-color: #2ecc71;;
+            color: #2ecc71;;
+            opacity: 0.3;
+        }
+
+        /* Active state shows filled background with white text */
+        .letter-e-low.active {
+            color: white !important;
+            background: #b65994 !important;
+        }
+        
+        .letter-a.active {
+            color: white !important;
+            background: #1219f3 !important;
+        }
+        
+        .letter-d.active {
+            color: white !important;
+            background: #f1840f !important;
+        }
+        
+        .letter-g.active {
+            color: white !important;
+            background: #2ebccc !important;
+        }
+        
+        .letter-b.active {
+            color: white !important;
+            background: #c239ef!important;
+        }
+        
+        .letter-e-high.active {
+            color: white !important;
+            background: #2ecc71 !important;
+        }
+
+        .pickbot {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 150px;
+            height: 450px;
+            background: url('images/PickbotTrans.png') no-repeat center;
+            background-size: contain;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .pickbot:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .guitar-container {
+                width: 350px;
+                height: 100px;
+            }
+            
+            .string-buttons {
+                gap: 15px;
+                bottom: 40px;
+            }
+            
+            .string-button {
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
+            }
+
+            .sound-meter {
+                width: 250px;
+                height: 10px;
+            }
+
+            .meter-image {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="brick-wall"></div>
+    
+    <div class="tuner-container">
+        <div class="header">
+            <button class="home-btn" onclick="goHome()">🏠</button>
+            <div class="toggle-container">
+                <span class="toggle-label">AUTOMATIC</span>
+                <div class="toggle-switch active" id="autoToggle" onclick="toggleMode()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sound-meter">
+            <div class="string-meter meter-e-low" id="meter-e-low">
+                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/E Left Meter@4x.png" alt="E Meter">
+                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/E Left Arrow@4x.png" alt="E Arrow">
+            </div>
+            <div class="string-meter meter-a" id="meter-a">
+                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/A Meter@4x.png" alt="A Meter">
+                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/A Arrow@4x.png" alt="A Arrow">
+            </div>
+            <div class="string-meter meter-d" id="meter-d">
+                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/D Meter@4x.png" alt="D Meter">
+                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/D Arrow@4x.png" alt="D Arrow">
+            </div>
+            <div class="string-meter meter-g active" id="meter-g">
+                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/G Meter@4x.png" alt="G Meter">
+                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/G Arrow@4x.png" alt="G Arrow">
+            </div>
+            <div class="string-meter meter-b" id="meter-b">
+                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/B Meter@4x.png" alt="B Meter">
+                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/B Arrow@4x.png" alt="B Arrow">
+            </div>
+            <div class="string-meter meter-e-high" id="meter-e-high">
+                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/E Right Meter@4x.png" alt="E Meter">
+                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/E Right Arrow@4x.png" alt="E Arrow">
+            </div>
+        </div>
+
+        <div class="guitar-container">
+            <div class="guitar-headstock">
+                <div class="headstock-image"></div>
+                <div class="guitar-strings">
+                    <!-- These will use the actual string highlight images -->
+                    <div class="guitar-string string-e-low" id="string-e-low"></div>
+                    <div class="guitar-string string-a" id="string-a"></div>
+                    <div class="guitar-string string-d" id="string-d"></div>
+                    <div class="guitar-string string-g active" id="string-g"></div>
+                    <div class="guitar-string string-b" id="string-b"></div>
+                    <div class="guitar-string string-e-high" id="string-e-high"></div>
+                </div>
+                <div class="string-letters">
+                    <div class="string-letter letter-e-low" id="letter-e-low" onclick="selectString('e-low')">E</div>
+                    <div class="string-letter letter-a" id="letter-a" onclick="selectString('a')">A</div>
+                    <div class="string-letter letter-d" id="letter-d" onclick="selectString('d')">D</div>
+                    <div class="string-letter letter-g active" id="letter-g" onclick="selectString('g')">G</div>
+                    <div class="string-letter letter-b" id="letter-b" onclick="selectString('b')">B</div>
+                    <div class="string-letter letter-e-high" id="letter-e-high" onclick="selectString('e-high')">E</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pickbot" onclick="showPickbot()"></div>
+    </div>
+
+    <script>
+        let currentString = 'g';
+        let autoMode = true;
+        let meterInterval;
+        let autoTuneInterval;
+
+        const stringNotes = {
+            'e-low': 'E',
+            'a': 'A',
+            'd': 'D',
+            'g': 'G',
+            'b': 'B',
+            'e-high': 'E'
+        };
+
+        function selectString(stringName) {
+            // Remove active class from all elements
+            document.querySelectorAll('.guitar-string').forEach(str => {
+                str.classList.remove('active');
+            });
+            document.querySelectorAll('.string-letter').forEach(letter => {
+                letter.classList.remove('active');
+            });
+            document.querySelectorAll('.string-meter').forEach(meter => {
+                meter.classList.remove('active');
+                meter.classList.remove('checked');
+            });
+
+            // Add active class to selected elements
+            document.getElementById(`string-${stringName}`).classList.add('active');
+            document.getElementById(`letter-${stringName}`).classList.add('active');
+            document.getElementById(`meter-${stringName}`).classList.add('active');
+
+            // Update current string
+            currentString = stringName;
+
+            // Reset meter arrow for new string
+            const meterElement = document.getElementById(`meter-${stringName}`);
+            const arrowElement = meterElement.querySelector('.meter-arrow');
+            const uncheckedSrc = arrowElement.src.replace('Checked Arrow@4x.png', 'Arrow@4x.png');
+            arrowElement.src = uncheckedSrc;
+
+            // Animate meter for the selected string
+            animateMeter(stringName);
+
+            // Play note sound
+            playNote(stringName);
+        }
+
+        function toggleMode() {
+            autoMode = !autoMode;
+            const toggle = document.getElementById('autoToggle');
+            
+            if (autoMode) {
+                toggle.classList.add('active');
+                startAutoTuning();
+            } else {
+                toggle.classList.remove('active');
+                stopAutoTuning();
+            }
+        }
+
+        function animateMeter(stringName) {
+            const meterElement = document.getElementById(`meter-${stringName}`);
+            const arrowElement = meterElement.querySelector('.meter-arrow');
+            
+            // Clear any existing animation
+            if (meterInterval) {
+                clearInterval(meterInterval);
+            }
+            
+            let rotation = -30;
+            let direction = 1;
+            let oscillations = 0;
+            
+            meterInterval = setInterval(() => {
+                rotation += direction * 2;
+                
+                if (rotation >= 30 || rotation <= -30) {
+                    direction *= -1;
+                    oscillations++;
+                }
+                
+                arrowElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+                
+                if (oscillations >= 4) {
+                    clearInterval(meterInterval);
+                    
+                    // Gradually move to center
+                    let finalRotation = rotation;
+                    const centerInterval = setInterval(() => {
+                        if (Math.abs(finalRotation) > 1) {
+                            finalRotation *= 0.9;
+                            arrowElement.style.transform = `translate(-50%, -50%) rotate(${finalRotation}deg)`;
+                        } else {
+                            arrowElement.style.transform = `translate(-50%, -50%) rotate(0deg)`;
+                            // Add checked state
+                            meterElement.classList.add('checked');
+                            
+                            // Update arrow image to checked state
+                            const checkedSrc = arrowElement.src.replace('Arrow@4x.png', 'Checked Arrow@4x.png');
+                            arrowElement.src = checkedSrc;
+                            
+                            clearInterval(centerInterval);
+                        }
+                    }, 50);
+                }
+            }, 30);
+        }
+
+        function playNote(stringName) {
+            // Create Web Audio context for sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            const frequencies = {
+                'e-low': 82.41,
+                'a': 110.00,
+                'd': 146.83,
+                'g': 196.00,
+                'b': 246.94,
+                'e-high': 329.63
+            };
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequencies[stringName];
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 1);
+        }
+
+        function startAutoTuning() {
+            if (autoTuneInterval) {
+                clearInterval(autoTuneInterval);
+            }
+
+            autoTuneInterval = setInterval(() => {
+                if (autoMode && currentString) {
+                    const meterElement = document.getElementById(`meter-${currentString}`);
+                    const arrowElement = meterElement.querySelector('.meter-arrow');
+                    
+                    // Small random movements
+                    const variation = (Math.random() - 0.5) * 10;
+                    arrowElement.style.transform = `translate(-50%, -50%) rotate(${variation}deg)`;
+                    
+                    // Randomly show checked state
+                    if (Math.abs(variation) < 2) {
+                        meterElement.classList.add('checked');
+                        const checkedSrc = arrowElement.src.replace('Arrow@4x.png', 'Checked Arrow@4x.png');
+                        arrowElement.src = checkedSrc;
+                    } else {
+                        meterElement.classList.remove('checked');
+                        const uncheckedSrc = arrowElement.src.replace('Checked Arrow@4x.png', 'Arrow@4x.png');
+                        arrowElement.src = uncheckedSrc;
+                    }
+                }
+            }, 2000);
+        }
+
+        function stopAutoTuning() {
+            if (autoTuneInterval) {
+                clearInterval(autoTuneInterval);
+            }
+        }
+
+        function goHome() {
+            window.location.href = 'homepage.html';
+        }
+
+        function showPickbot() {
+            alert('PickBot: Welcome to the Guitar Tuner! Click on the letter circles next to the tuning pegs to select and tune each string. The meter will show you when the string is in tune!');
+        }
+
+        // Initialize with G string selected
+        document.addEventListener('DOMContentLoaded', function() {
+            selectString('g');
+            if (autoMode) {
+                startAutoTuning();
+            }
+        });
+    </script>
+    <script src="js/mousetrail.js"></script>
+</body>
+</html>

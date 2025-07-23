@@ -1,0 +1,199 @@
+:root {
+  --primary-purple: #d49efb;
+  --dark-purple:   #4c1a80;
+  --teal:          #003d4d;
+  --white:         #ffffff;
+  --light-gray:    #cccccc;
+  --transition:    0.3s ease;
+  --border-radius: 8px;
+  --border-width:  2px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(45deg, #0a0f0f, var(--dark-purple), var(--teal));
+  background-size: 200% 200%;
+  background-image: url("../images/Brick_Wall.png");
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4rem;
+  color: var(--white);
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% 80%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 80%; }
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  padding: 0;
+  margin: 0 0 2rem;
+}
+nav ul li a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  transition: var(--transition);
+}
+nav ul li a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0; height: 2px;
+  background: var(--white);
+  transition: var(--transition);
+}
+nav ul li a:hover::after {
+  width: 100%;
+}
+
+#profile-container {
+  width: 90%;
+  max-width: 480px;
+  padding: 2rem;
+  background: rgba(10, 15, 15, 0.85);
+  border-radius: var(--border-radius);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+  margin: 0 auto;
+}
+#profile-form label {
+  display: block;
+  margin: 1rem 0 .25rem;
+  color: var(--white);
+}
+#profile-form input,
+#profile-form select,
+#profile-form button {
+  width: 100%;
+  padding: .6rem;
+  margin-bottom: 1rem;
+  border: var(--border-width) solid var(--light-gray);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+#profile-form button {
+  background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+  color: var(--white);
+  cursor: pointer;
+  font-weight: bold;
+  transition: var(--transition);
+}
+#profile-form button:hover {
+  opacity: 0.9;
+}
+
+#preview {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* -------------------------------
+   Avatar preview & layering
+---------------------------------*/
+ /* Avatar preview: center each layer & preserve its natural aspect-ratio */
+ #avatar-preview {
+  position: relative;
+  width: 200px;      /* or whatever your desired container width */
+  height: 260px;     /* match the tallest art layer */
+margin: 1rem auto;
+  background: var(--avatar-color, rgba(255,255,255,0.1));
+  border-radius: 8px; /* soften corners */
+  overflow: hidden;   /* clip anything outside */
+}
+#avatar-preview img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 100%;
+  max-height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Editor controls */
+#avatar-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+#avatar-editor label {
+  display: flex;
+  flex-direction: column;
+  color: var(--white);
+}
+#avatar-editor select {
+  margin-top: .25rem;
+  padding: .3rem;
+  border-radius: 4px;
+}
+
+/* Greeting & instrument text */
+#greeting,
+#instrument-display {
+  margin: .5rem 0;
+  font-weight: 600;
+}
+
+
+/* ─── pickbot.css ─── */
+
+/* wrapper around your img.pickbot-image */
+.pickbot-character {
+  position: relative;
+  display: inline-block;
+}
+
+/* just in case */
+.pickbot-character .pickbot-image {
+  display: block;
+}
+
+/* ─── shared pop-in keyframes ─── */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ─── ARMS (you already have these) ─── */
+.pickbot-arm {
+  position: absolute;
+  top: 50%;
+  width: 205px;    /* tweak as needed */
+  height: 590px;   /* tweak as needed */
+  background-size: contain;
+  background-repeat: no-repeat;
+
+  transform-origin: center center;
+  transform: translateY(-50%) scale(0);
+  opacity: 0;
+  animation: popIn 0.8s ease 0.4s both;
+}
+.pickbot-arm.left {
+  left: 1px;
+  background-image: url("../images/Choice Elements/Hands/Base Hands@4x.png");
+}
+.pickbot-arm.right {
+  /* if you still want to hide the right arm: */
+  display: none !important;
+  /* otherwise use:
+  right: -25px;
+  transform: translateY(-50%) scaleX(-1) scale(0);
+  background-image: url("../images/Choice Elements/Hands/Base Hands@4x.png");
+  */
+}
+
