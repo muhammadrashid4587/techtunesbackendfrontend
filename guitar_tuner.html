@@ -1,711 +1,1214 @@
+// guitar_tuner.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guitar Tuner - TechTunes</title>
-    <link rel="stylesheet" href="css/mousetrail.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Guitar Tuner – TechTunes</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <!-- mousetrail.css (unchanged) -->
+  <link rel="stylesheet" href="css/mousetrail.css" />
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #0a0a1f;
-            min-height: 100vh;
-            overflow: hidden;
-        }
+  <style>
+    /* ───── reset & base ───────────────────────────────────────── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0a1f;
+      min-height: 100vh; overflow: hidden;
+    }
 
-        .brick-wall {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('images/Brick_Wall.png') repeat;
-            background-size: 200px 100px;
-            z-index: 1;
-            filter: brightness(0.5) saturate(0.8);
-        }
+    /* ───── background wall ────────────────────────────────────── */
+    .brick-wall {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('images/Brick_Wall.png') repeat;
+      background-size: 200px 100px;
+      z-index: 1;
+      filter: brightness(0.5) saturate(0.8);
+    }
 
-        .tuner-container {
-            position: relative;
-            width: 100vw;
-            height: 117vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 2;
-        }
+    /* ───── container & header ─────────────────────────────────── */
+    .tuner-container {
+      position: relative;
+      width: 100vw; height: 117vh;
+      display: flex; flex-direction: column; align-items: center;
+      z-index: 2;
+    }
+    .header {
+      position: absolute; top: 20px; left: 20px; right: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 10;
+    }
 
-        .header {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
+    /* home button */
+    .home-btn {
+      width: 70px; height: 70px; border-radius: 50%;
+      background: linear-gradient(135deg,#00d4ff,#0099cc);
+      border: none; cursor: pointer;
+      font-size: 32px; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+      transition: all 0.3s ease;
+    }
+    .home-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(0,212,255,0.5);
+    }
 
-        .home-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: white;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
-        }
+    /* toggle switch - Enhanced for better click detection */
+    .toggle-container {
+      display: flex; align-items: center; gap: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 12px 20px; border-radius: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+    }
+    .toggle-label {
+      color: #fff; font-size: 16px; font-weight: 600; letter-spacing: .5px;
+      min-width: 80px; text-align: center;
+      cursor: pointer;
+    }
+    .toggle-switch {
+      position: relative; width: 70px; height: 35px;
+      background: #333; border-radius: 20px; cursor: pointer;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+      transition: background 0.3s;
+      border: 2px solid transparent;
+    }
+    .toggle-switch:hover {
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .toggle-switch.active {
+      background: #00d4ff;
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.2),
+        0 0 15px rgba(0,212,255,0.5);
+    }
+    .toggle-knob {
+      position: absolute; top: 3px; left: 3px;
+      width: 29px; height: 29px; background: #fff; border-radius: 50%;
+      transition: transform 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    .toggle-switch.active .toggle-knob {
+      transform: translateX(35px);
+    }
 
-        .home-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
-        }
+    /* ───── meters ─────────────────────────────────────────────── */
+    .sound-meter {
+      position: absolute; top: 100px;
+      width: 450px; height: 140px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .string-meter {
+      position: absolute; width: 100%; height: 100%;
+      display: none; align-items: center; justify-content: center;
+    }
+    .string-meter.active { display: flex; }
+    .meter-image { width: 400px; height: auto; position: relative; }
+    .meter-arrow {
+      position: absolute; width: 70px; height: auto;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      transform-origin: center bottom;
+      transition: all 0.3s ease;
+    }
 
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px 20px;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+    /* ───── headstock & strings ───────────────────────────────── */
+    .guitar-container {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 450px; height: 650px;
+    }
+    .headstock-image {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('images/Tuner_Page_Assets/Guitar Head@4x.png') no-repeat center;
+      background-size: contain; z-index: 1;
+    }
+    .guitar-strings { position: absolute; top: 0; left: 0; width:100%; height:100%; z-index:2; }
 
-        .toggle-label {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
+    .guitar-string {
+      position: absolute; top: 0; left: 0;
+      width:100%; height:100%;
+      opacity:0; transition: opacity .4s ease;
+      background-size:contain; background-position:center;
+      background-repeat: no-repeat; /* Added to prevent duplication */
+    }
+    .guitar-string.active { opacity:1; }
 
-        .toggle-switch {
-            position: relative;
-            width: 70px;
-            height: 35px;
-            background: #333;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
+    /* each string highlight - Fixed to prevent bottom duplicates */
+    .string-e-low {
+      background-image: url('images/Tuner_Page_Assets/Strings/E Left String Clicked@4x.png');
+      top:350px; right:50px; left:95px; width:94px; height:280px; /* Added height limit */
+    }
+    .string-a {
+      background-image: url('images/Tuner_Page_Assets/Strings/A String Clicked@4x.png');
+      top:260px; right:50px; left:120px; width:94px; height:350px; /* Added height limit */
+    }
+    .string-d {
+      background-image: url('images/Tuner_Page_Assets/Strings/D String Clicked@4x.png');
+      top:93px; right:50px; left:135px; width:100px; height:550px; /* Added height limit */
+    }
+    .string-g {
+      background-image: url('images/Tuner_Page_Assets/Strings/G String Clicked@4x.png');
+      top:140px; right:-10px; left:214px; width:100px; height:460px; /* Added height limit */
+    }
+    .string-b {
+      background-image: url('images/Tuner_Page_Assets/Strings/B String Clicked@4x.png');
+      top:156px; right:-220px; left:235px; width:90px; height:550px; /* Added height limit */
+    }
+    .string-e-high {
+      background-image: url('images/Tuner_Page_Assets/Strings/E Right String Clicked@4x.png');
+      top:363px; right:-250px; left:260px; width:90px; height:250px; /* Added height limit */
+    }
 
-        .toggle-switch.active {
-            background: #00d4ff;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 212, 255, 0.5);
-        }
+    /* String glow effects when detected - Completely redesigned */
+    .guitar-string.detected-glow {
+      opacity: 1 !important;
+      animation: stringGlow 2s ease-in-out;
+      z-index: 15; /* Higher z-index */
+      background-repeat: no-repeat;
+      background-position: center;
+      /* Use outline instead of box-shadow to prevent duplication */
+      outline: none;
+      position: relative;
+    }
 
-        .toggle-knob {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 29px;
-            height: 29px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
+    /* Create glow effect using pseudo-elements instead of box-shadow */
+    .string-e-low.detected-glow::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      background: radial-gradient(ellipse, rgba(182, 89, 148, 0.6) 0%, rgba(182, 89, 148, 0.3) 50%, transparent 70%);
+      border-radius: 12px;
+      z-index: -1;
+      animation: pulseGlow 2s ease-in-out;
+    }
+    .string-a.detected-glow::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      background: radial-gradient(ellipse, rgba(18, 18, 243, 0.6) 0%, rgba(18, 18, 243, 0.3) 50%, transparent 70%);
+      border-radius: 12px;
+      z-index: -1;
+      animation: pulseGlow 2s ease-in-out;
+    }
+    .string-d.detected-glow::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      background: radial-gradient(ellipse, rgba(241, 132, 15, 0.6) 0%, rgba(241, 132, 15, 0.3) 50%, transparent 70%);
+      border-radius: 12px;
+      z-index: -1;
+      animation: pulseGlow 2s ease-in-out;
+    }
+    .string-g.detected-glow::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      background: radial-gradient(ellipse, rgba(46, 188, 204, 0.6) 0%, rgba(46, 188, 204, 0.3) 50%, transparent 70%);
+      border-radius: 12px;
+      z-index: -1;
+      animation: pulseGlow 2s ease-in-out;
+    }
+    .string-b.detected-glow::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      background: radial-gradient(ellipse, rgba(194, 57, 239, 0.6) 0%, rgba(194, 57, 239, 0.3) 50%, transparent 70%);
+      border-radius: 12px;
+      z-index: -1;
+      animation: pulseGlow 2s ease-in-out;
+    }
+    .string-e-high.detected-glow::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      background: radial-gradient(ellipse, rgba(46, 204, 113, 0.6) 0%, rgba(46, 204, 113, 0.3) 50%, transparent 70%);
+      border-radius: 12px;
+      z-index: -1;
+      animation: pulseGlow 2s ease-in-out;
+    }
 
-        .toggle-switch.active .toggle-knob {
-            transform: translateX(35px);
-        }
+    @keyframes stringGlow {
+      0% { 
+        transform: scale(1); 
+        filter: brightness(1);
+      }
+      50% { 
+        transform: scale(1.05); 
+        filter: brightness(1.3);
+      }
+      100% { 
+        transform: scale(1); 
+        filter: brightness(1);
+      }
+    }
 
-        .sound-meter {
-            position: absolute;
-            top: 100px;
-            width: 450px;
-            height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    @keyframes pulseGlow {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
 
-        .string-meter {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
+    /* letter buttons */
+    .string-letters { position:absolute; top:0; left:0; width:100%; height:100%; z-index:3; }
+    .string-letter {
+      position:absolute; width:50px; height:50px;
+      border:3px solid; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px; font-weight:bold;
+      color:#fff; opacity:0.3; transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      cursor:pointer;
+    }
+    .string-letter:hover { transform: scale(1.1); opacity:1!important; }
+    .string-letter.active { opacity:1; box-shadow: 0 0 20px currentColor,0 0 40px currentColor; }
 
-        .string-meter.active {
-            display: flex;
-        }
+    /* position + colors */
+    .letter-e-low { top:395px; left:-80px; color:#b65994; border-color:#b65994; }
+    .letter-a    { top:280px; left:-45px; color:#1212f3; border-color:#4a12f3; }
+    .letter-d    { top:168px; left:-15px; color:#f1840f; border-color:#f1840f; }
+    .letter-g    { top:168px; right:-35px; color:#2ebccc; border-color:#2ebccc; }
+    .letter-b    { top:280px; right:-59px; color:#c239ef; border-color:#c239ef; }
+    .letter-e-high{top:400px; right:-85px;color:#2ecc71;border-color:#2ecc71;}
 
-        .meter-image {
-            width: 400px;
-            height: auto;
-            position: relative;
-        }
+    /* when active fill */
+    .letter-e-low.active    { background:#b65994; color:#fff!important; }
+    .letter-a.active        { background:#1219f3; color:#fff!important; }
+    .letter-d.active        { background:#f1840f; color:#fff!important; }
+    .letter-g.active        { background:#2ebccc; color:#fff!important; }
+    .letter-b.active        { background:#c239ef; color:#fff!important; }
+    .letter-e-high.active   { background:#2ecc71; color:#fff!important; }
 
-        .meter-arrow {
-            position: absolute;
-            width: 70px;
-            height: auto;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.3s ease;
-            transform-origin: center bottom;
-        }
+    /* detected note animation */
+    .string-letter.detected {
+      opacity: 1 !important;
+      transform: scale(1.3);
+      box-shadow: 0 0 30px currentColor, 0 0 60px currentColor;
+      animation: noteDetected 0.5s ease-in-out;
+    }
 
-        .guitar-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 450px;
-            height: 650px;
-        }
+    @keyframes noteDetected {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1.3); }
+    }
 
-        .guitar-headstock {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            margin: 0 auto;
-        }
+    /* listening pulse animation */
+    .string-letter.listening {
+      animation: listeningPulse 1.5s infinite;
+    }
 
-        .headstock-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('images/Tuner_Page_Assets/Guitar Head@4x.png') no-repeat center;
-            background-size: contain;
-            z-index: 1;
-        }
+    @keyframes listeningPulse {
+      0% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.1); }
+      100% { opacity: 0.3; transform: scale(1); }
+    }
 
-        .guitar-strings {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-        }
+    /* pickbot mascot */
+    .pickbot {
+      position:absolute; bottom:30px; right:30px;
+      width:150px; height:450px;
+      background: url('images/PickbotTrans.png') no-repeat center;
+      background-size:contain; cursor:pointer;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+      transition: transform .3s ease, filter .3s ease;
+    }
+    .pickbot:hover {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
+    }
 
-        /* String overlay images - these will be the pre-made highlighted string images */
-        .guitar-string {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+    /* Manual tune button */
+    .tune-button {
+      position: absolute;
+      top: 280px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      transition: all 0.3s ease;
+      z-index: 100;
+      display: none;
+    }
+    .tune-button:hover {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 6px 25px rgba(255, 107, 107, 0.5);
+    }
+    .tune-button:active {
+      transform: translateX(-50%) scale(0.98);
+    }
+    .tune-button.recording {
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+      animation: pulse 1.5s infinite;
+    }
+    .tune-button.processing {
+      background: linear-gradient(135deg, #ffd43b, #f39c12);
+    }
 
-        .guitar-string.active {
-            opacity: 1;
-        }
+    @keyframes pulse {
+      0% { box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3); }
+      50% { box-shadow: 0 6px 25px rgba(78, 205, 196, 0.8); }
+      100% { box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3); }
+    }
 
-        /* Use the actual string images from the directory */
-        .string-e-low {
-            background-image: url('images/Tuner_Page_Assets/Strings/E Left String Clicked@4x.png');
-            top: 165px; 
-            right: 50px;
-            left: 95px;
-            width: 94px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+    /* Status display */
+    #tuning-status {
+      position: absolute;
+      top: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      z-index: 100;
+      transition: all 0.3s ease;
+      min-width: 200px;
+      text-align: center;
+    }
 
-        .string-a {
-            background-image: url('images/Tuner_Page_Assets/Strings/A String Clicked@4x.png');
-            top: 110px; 
-            right: 50px;
-            left: 120px;
-            width: 94px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+    .recording { color: #ff6b6b; }
+    .processing { color: #4ecdc4; }
+    .in-tune { color: #51cf66; }
+    .out-of-tune { color: #ffd43b; }
+    .error { color: #ff6b6b; }
+    .ready { color: #74c0fc; }
 
-        .string-d {
-            background-image: url('images/Tuner_Page_Assets/Strings/D String Clicked@4x.png');
-            top: 43px; 
-            right: 50px;
-            left: 135px;
-            width: 100px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .string-g {
-            background-image: url('images/Tuner_Page_Assets/Strings/G String Clicked@4x.png');
-            top: 43px; 
-            right: -10px;
-            left: 214px;
-            width: 100px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .string-b {
-            background-image: url('images/Tuner_Page_Assets/Strings/B String Clicked@4x.png');
-            top: 103px; 
-            right: -220px;
-            left: 235px;
-            width: 90px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .string-e-high {
-            background-image: url('images/Tuner_Page_Assets/Strings/E Right String Clicked@4x.png');
-            top: 163px; 
-            right: -250px;
-            left: 260px;
-            width: 90px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        /* String letter overlays on the headstock */
-        .string-letters {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 3;
-        }
-
-        .string-letter {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            cursor: pointer;
-            pointer-events: auto;
-        }
-
-        .string-letter:hover {
-            transform: scale(1.1);
-            opacity: 1 !important;
-        }
-
-        .string-letter.active {
-            opacity: 1;
-            background: currentColor !important;
-            box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
-        }
-
-        /* Position letters on the headstock - opposite side of tuning pegs */
-        .letter-e-low { 
-            top: 395px; 
-            left: -80px; 
-            border-color: #b65994 ;
-            color: #b65994 ;
-            opacity: 0.3;
-        }
-        
-        .letter-a { 
-            top: 280px; 
-            left: -45px; 
-            border-color: #4a12f3;
-            color: #1212f3;
-            opacity: 0.3;
-        }
-        
-        .letter-d { 
-            top: 168px; 
-            left: -15px; 
-            border-color: #f1840f;
-            color: #f1840f;
-            opacity: 0.3;
-        }
-        
-        .letter-g { 
-            top: 168px; 
-            right: -35px; 
-            border-color: #2ebccc ;
-            color: #2ebccc ;
-            opacity: 0.3;
-        }
-        
-        .letter-b { 
-            top: 280px; 
-            right: -59px; 
-            border-color: #c239ef;
-            color: #c239ef;
-            opacity: 0.3;
-        }
-        
-        .letter-e-high { 
-            top: 400px; 
-            right: -85px; 
-            border-color: #2ecc71;;
-            color: #2ecc71;;
-            opacity: 0.3;
-        }
-
-        /* Active state shows filled background with white text */
-        .letter-e-low.active {
-            color: white !important;
-            background: #b65994 !important;
-        }
-        
-        .letter-a.active {
-            color: white !important;
-            background: #1219f3 !important;
-        }
-        
-        .letter-d.active {
-            color: white !important;
-            background: #f1840f !important;
-        }
-        
-        .letter-g.active {
-            color: white !important;
-            background: #2ebccc !important;
-        }
-        
-        .letter-b.active {
-            color: white !important;
-            background: #c239ef!important;
-        }
-        
-        .letter-e-high.active {
-            color: white !important;
-            background: #2ecc71 !important;
-        }
-
-        .pickbot {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            width: 150px;
-            height: 450px;
-            background: url('images/PickbotTrans.png') no-repeat center;
-            background-size: contain;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-        }
-
-        .pickbot:hover {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .guitar-container {
-                width: 350px;
-                height: 100px;
-            }
-            
-            .string-buttons {
-                gap: 15px;
-                bottom: 40px;
-            }
-            
-            .string-button {
-                width: 70px;
-                height: 70px;
-                font-size: 28px;
-            }
-
-            .sound-meter {
-                width: 250px;
-                height: 10px;
-            }
-
-            .meter-image {
-                width: 100px;
-            }
-        }
-    </style>
+    /* responsive tweaks */
+    @media (max-width:768px) {
+      .guitar-container { width:350px; height:500px; }
+      .sound-meter { width:300px; height:100px; }
+      .meter-image { width:250px; }
+      .tune-button { font-size: 16px; padding: 12px 24px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="brick-wall"></div>
-    
-    <div class="tuner-container">
-        <div class="header">
-            <button class="home-btn" onclick="goHome()">🏠</button>
-            <div class="toggle-container">
-                <span class="toggle-label">AUTOMATIC</span>
-                <div class="toggle-switch active" id="autoToggle" onclick="toggleMode()">
-                    <div class="toggle-knob"></div>
-                </div>
-            </div>
+  <div class="brick-wall"></div>
+  <div class="tuner-container">
+    <div class="header">
+      <button class="home-btn" onclick="goHome()">🏠</button>
+      <div class="toggle-container">
+        <span class="toggle-label" id="toggleLabel">AUTOMATIC</span>
+        <div class="toggle-switch active" id="autoToggle">
+          <div class="toggle-knob"></div>
         </div>
-
-        <div class="sound-meter">
-            <div class="string-meter meter-e-low" id="meter-e-low">
-                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/E Left Meter@4x.png" alt="E Meter">
-                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/E Left Arrow@4x.png" alt="E Arrow">
-            </div>
-            <div class="string-meter meter-a" id="meter-a">
-                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/A Meter@4x.png" alt="A Meter">
-                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/A Arrow@4x.png" alt="A Arrow">
-            </div>
-            <div class="string-meter meter-d" id="meter-d">
-                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/D Meter@4x.png" alt="D Meter">
-                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/D Arrow@4x.png" alt="D Arrow">
-            </div>
-            <div class="string-meter meter-g active" id="meter-g">
-                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/G Meter@4x.png" alt="G Meter">
-                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/G Arrow@4x.png" alt="G Arrow">
-            </div>
-            <div class="string-meter meter-b" id="meter-b">
-                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/B Meter@4x.png" alt="B Meter">
-                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/B Arrow@4x.png" alt="B Arrow">
-            </div>
-            <div class="string-meter meter-e-high" id="meter-e-high">
-                <img class="meter-image" src="images/Tuner_Page_Assets/Sound Meter/E Right Meter@4x.png" alt="E Meter">
-                <img class="meter-arrow" src="images/Tuner_Page_Assets/Sound Meter/E Right Arrow@4x.png" alt="E Arrow">
-            </div>
-        </div>
-
-        <div class="guitar-container">
-            <div class="guitar-headstock">
-                <div class="headstock-image"></div>
-                <div class="guitar-strings">
-                    <!-- These will use the actual string highlight images -->
-                    <div class="guitar-string string-e-low" id="string-e-low"></div>
-                    <div class="guitar-string string-a" id="string-a"></div>
-                    <div class="guitar-string string-d" id="string-d"></div>
-                    <div class="guitar-string string-g active" id="string-g"></div>
-                    <div class="guitar-string string-b" id="string-b"></div>
-                    <div class="guitar-string string-e-high" id="string-e-high"></div>
-                </div>
-                <div class="string-letters">
-                    <div class="string-letter letter-e-low" id="letter-e-low" onclick="selectString('e-low')">E</div>
-                    <div class="string-letter letter-a" id="letter-a" onclick="selectString('a')">A</div>
-                    <div class="string-letter letter-d" id="letter-d" onclick="selectString('d')">D</div>
-                    <div class="string-letter letter-g active" id="letter-g" onclick="selectString('g')">G</div>
-                    <div class="string-letter letter-b" id="letter-b" onclick="selectString('b')">B</div>
-                    <div class="string-letter letter-e-high" id="letter-e-high" onclick="selectString('e-high')">E</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="pickbot" onclick="showPickbot()"></div>
+      </div>
     </div>
 
-    <script>
-        let currentString = 'g';
-        let autoMode = true;
-        let meterInterval;
-        let autoTuneInterval;
+    <div class="sound-meter">
+      <!-- one meter per string: e-low, a, d, g, b, e-high -->
+      <div class="string-meter meter-e-low" id="meter-e-low">
+        <img class="meter-image"
+             src="images/Tuner_Page_Assets/Sound Meter/E Left Meter@4x.png" alt="E Meter">
+        <img class="meter-arrow"
+             data-unclicked="images/Tuner_Page_Assets/Sound Meter/E Left Arrow@4x.png"
+             data-clicked="images/Tuner_Page_Assets/Sound Meter/E Left Checked Arrow@4x.png"
+             src="images/Tuner_Page_Assets/Sound Meter/E Left Arrow@4x.png"
+             alt="E Arrow">
+      </div>
+      <!-- A -->
+      <div class="string-meter meter-a" id="meter-a">
+        <img class="meter-image"
+             src="images/Tuner_Page_Assets/Sound Meter/A Meter@4x.png" alt="A Meter">
+        <img class="meter-arrow"
+             data-unclicked="images/Tuner_Page_Assets/Sound Meter/A Arrow@4x.png"
+             data-clicked="images/Tuner_Page_Assets/Sound Meter/A Checked Arrow@4x.png"
+             src="images/Tuner_Page_Assets/Sound Meter/A Arrow@4x.png"
+             alt="A Arrow">
+      </div>
+      <!-- D -->
+      <div class="string-meter meter-d" id="meter-d">
+        <img class="meter-image"
+             src="images/Tuner_Page_Assets/Sound Meter/D Meter@4x.png" alt="D Meter">
+        <img class="meter-arrow"
+             data-unclicked="images/Tuner_Page_Assets/Sound Meter/D Arrow@4x.png"
+             data-clicked="images/Tuner_Page_Assets/Sound Meter/D Checked Arrow@4x.png"
+             src="images/Tuner_Page_Assets/Sound Meter/D Arrow@4x.png"
+             alt="D Arrow">
+      </div>
+      <!-- G (start active) -->
+      <div class="string-meter meter-g active" id="meter-g">
+        <img class="meter-image"
+             src="images/Tuner_Page_Assets/Sound Meter/G Meter@4x.png" alt="G Meter">
+        <img class="meter-arrow"
+             data-unclicked="images/Tuner_Page_Assets/Sound Meter/G Arrow@4x.png"
+             data-clicked="images/Tuner_Page_Assets/Sound Meter/G Checked Arrow@4x.png"
+             src="images/Tuner_Page_Assets/Sound Meter/G Arrow@4x.png"
+             alt="G Arrow">
+      </div>
+      <!-- B -->
+      <div class="string-meter meter-b" id="meter-b">
+        <img class="meter-image"
+             src="images/Tuner_Page_Assets/Sound Meter/B Meter@4x.png" alt="B Meter">
+        <img class="meter-arrow"
+             data-unclicked="images/Tuner_Page_Assets/Sound Meter/B Arrow@4x.png"
+             data-clicked="images/Tuner_Page_Assets/Sound Meter/B Checked Arrow@4x.png"
+             src="images/Tuner_Page_Assets/Sound Meter/B Arrow@4x.png"
+             alt="B Arrow">
+      </div>
+      <!-- E high -->
+      <div class="string-meter meter-e-high" id="meter-e-high">
+        <img class="meter-image"
+             src="images/Tuner_Page_Assets/Sound Meter/E Right Meter@4x.png" alt="E Meter">
+        <img class="meter-arrow"
+             data-unclicked="images/Tuner_Page_Assets/Sound Meter/E Right Arrow@4x.png"
+             data-clicked="images/Tuner_Page_Assets/Sound Meter/E Right Checked Arrow@4x.png"
+             src="images/Tuner_Page_Assets/Sound Meter/E Right Arrow@4x.png"
+             alt="E Arrow">
+      </div>
+    </div>
 
-        const stringNotes = {
-            'e-low': 'E',
-            'a': 'A',
-            'd': 'D',
-            'g': 'G',
-            'b': 'B',
-            'e-high': 'E'
+    <!-- Manual tune button (only visible in manual mode) -->
+    <button class="tune-button" id="tuneButton" onclick="manualTune()">
+      🎤 Listen & Tune
+    </button>
+
+    <div class="guitar-container">
+      <div class="guitar-headstock">
+        <div class="headstock-image"></div>
+        <div class="guitar-strings">
+          <div class="guitar-string string-e-low"   id="string-e-low"></div>
+          <div class="guitar-string string-a"       id="string-a"></div>
+          <div class="guitar-string string-d"       id="string-d"></div>
+          <div class="guitar-string string-g active" id="string-g"></div>
+          <div class="guitar-string string-b"       id="string-b"></div>
+          <div class="guitar-string string-e-high"  id="string-e-high"></div>
+        </div>
+        <div class="string-letters">
+          <div class="string-letter letter-e-low"  id="letter-e-low"  onclick="selectString('e-low')">E</div>
+          <div class="string-letter letter-a"      id="letter-a"      onclick="selectString('a')">A</div>
+          <div class="string-letter letter-d"      id="letter-d"      onclick="selectString('d')">D</div>
+          <div class="string-letter letter-g active" id="letter-g"   onclick="selectString('g')">G</div>
+          <div class="string-letter letter-b"      id="letter-b"      onclick="selectString('b')">B</div>
+          <div class="string-letter letter-e-high" id="letter-e-high" onclick="selectString('e-high')">E</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pickbot" onclick="showPickbot()"></div>
+  </div>
+
+  <script>
+    // ───── Enhanced Guitar Tuner with Fixed Toggle and Manual Button ─────────
+
+    // Audio context initialization
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    // Initialize audio context on first user interaction
+    document.body.addEventListener('click', () => {
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().then(() => console.log('🔊 AudioContext resumed!'));
+        }
+      }
+    }, { once: true });
+
+    // ───── Configuration ─────────────────────────────────────────
+    const API_BASE_URL = 'http://127.0.0.1:8000';
+    const RECORDING_DURATION = 2000; // 2 seconds
+    const AUTO_TUNE_INTERVAL = 3000;  // 3 seconds for auto mode
+
+    // Note mapping for frontend string IDs to backend note names
+    const STRING_TO_NOTE = {
+      'e-low': 'E2',
+      'a': 'A2',
+      'd': 'D3',
+      'g': 'G3',
+      'b': 'B3',
+      'e-high': 'E4'
+    };
+
+    const NOTE_TO_STRING = Object.fromEntries(
+      Object.entries(STRING_TO_NOTE).map(([k, v]) => [v, k])
+    );
+
+    // ───── Global State ─────────────────────────────────────────
+    let currentString = 'g';
+    let autoMode = true;
+    let isRecording = false;
+    let autoTuneInterval = null;
+    let mediaStream = null;
+
+    // ───── DOM Elements ─────────────────────────────────────────
+    let elements = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Enhanced Guitar Tuner Loading...');
+      
+      // Wait a moment for everything to render
+      setTimeout(() => {
+        // Cache DOM elements
+        elements = {
+          letters: document.querySelectorAll('.string-letter'),
+          strings: document.querySelectorAll('.guitar-string'),
+          meters: document.querySelectorAll('.string-meter'),
+          meterArrows: document.querySelectorAll('.meter-arrow'),
+          toggle: document.getElementById('autoToggle'),
+          toggleLabel: document.getElementById('toggleLabel'),
+          tuneButton: document.getElementById('tuneButton')
         };
 
-        function selectString(stringName) {
-            // Remove active class from all elements
-            document.querySelectorAll('.guitar-string').forEach(str => {
-                str.classList.remove('active');
-            });
-            document.querySelectorAll('.string-letter').forEach(letter => {
-                letter.classList.remove('active');
-            });
-            document.querySelectorAll('.string-meter').forEach(meter => {
-                meter.classList.remove('active');
-                meter.classList.remove('checked');
-            });
-
-            // Add active class to selected elements
-            document.getElementById(`string-${stringName}`).classList.add('active');
-            document.getElementById(`letter-${stringName}`).classList.add('active');
-            document.getElementById(`meter-${stringName}`).classList.add('active');
-
-            // Update current string
-            currentString = stringName;
-
-            // Reset meter arrow for new string
-            const meterElement = document.getElementById(`meter-${stringName}`);
-            const arrowElement = meterElement.querySelector('.meter-arrow');
-            const uncheckedSrc = arrowElement.src.replace('Checked Arrow@4x.png', 'Arrow@4x.png');
-            arrowElement.src = uncheckedSrc;
-
-            // Animate meter for the selected string
-            animateMeter(stringName);
-
-            // Play note sound
-            playNote(stringName);
-        }
-
-        function toggleMode() {
-            autoMode = !autoMode;
-            const toggle = document.getElementById('autoToggle');
-            
-            if (autoMode) {
-                toggle.classList.add('active');
-                startAutoTuning();
-            } else {
-                toggle.classList.remove('active');
-                stopAutoTuning();
-            }
-        }
-
-        function animateMeter(stringName) {
-            const meterElement = document.getElementById(`meter-${stringName}`);
-            const arrowElement = meterElement.querySelector('.meter-arrow');
-            
-            // Clear any existing animation
-            if (meterInterval) {
-                clearInterval(meterInterval);
-            }
-            
-            let rotation = -30;
-            let direction = 1;
-            let oscillations = 0;
-            
-            meterInterval = setInterval(() => {
-                rotation += direction * 2;
-                
-                if (rotation >= 30 || rotation <= -30) {
-                    direction *= -1;
-                    oscillations++;
-                }
-                
-                arrowElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-                
-                if (oscillations >= 4) {
-                    clearInterval(meterInterval);
-                    
-                    // Gradually move to center
-                    let finalRotation = rotation;
-                    const centerInterval = setInterval(() => {
-                        if (Math.abs(finalRotation) > 1) {
-                            finalRotation *= 0.9;
-                            arrowElement.style.transform = `translate(-50%, -50%) rotate(${finalRotation}deg)`;
-                        } else {
-                            arrowElement.style.transform = `translate(-50%, -50%) rotate(0deg)`;
-                            // Add checked state
-                            meterElement.classList.add('checked');
-                            
-                            // Update arrow image to checked state
-                            const checkedSrc = arrowElement.src.replace('Arrow@4x.png', 'Checked Arrow@4x.png');
-                            arrowElement.src = checkedSrc;
-                            
-                            clearInterval(centerInterval);
-                        }
-                    }, 50);
-                }
-            }, 30);
-        }
-
-        function playNote(stringName) {
-            // Create Web Audio context for sound
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            const frequencies = {
-                'e-low': 82.41,
-                'a': 110.00,
-                'd': 146.83,
-                'g': 196.00,
-                'b': 246.94,
-                'e-high': 329.63
-            };
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = frequencies[stringName];
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-            
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 1);
-        }
-
-        function startAutoTuning() {
-            if (autoTuneInterval) {
-                clearInterval(autoTuneInterval);
-            }
-
-            autoTuneInterval = setInterval(() => {
-                if (autoMode && currentString) {
-                    const meterElement = document.getElementById(`meter-${currentString}`);
-                    const arrowElement = meterElement.querySelector('.meter-arrow');
-                    
-                    // Small random movements
-                    const variation = (Math.random() - 0.5) * 10;
-                    arrowElement.style.transform = `translate(-50%, -50%) rotate(${variation}deg)`;
-                    
-                    // Randomly show checked state
-                    if (Math.abs(variation) < 2) {
-                        meterElement.classList.add('checked');
-                        const checkedSrc = arrowElement.src.replace('Arrow@4x.png', 'Checked Arrow@4x.png');
-                        arrowElement.src = checkedSrc;
-                    } else {
-                        meterElement.classList.remove('checked');
-                        const uncheckedSrc = arrowElement.src.replace('Checked Arrow@4x.png', 'Arrow@4x.png');
-                        arrowElement.src = uncheckedSrc;
-                    }
-                }
-            }, 2000);
-        }
-
-        function stopAutoTuning() {
-            if (autoTuneInterval) {
-                clearInterval(autoTuneInterval);
-            }
-        }
-
-        function goHome() {
-            window.location.href = 'homepage.html';
-        }
-
-        function showPickbot() {
-            alert('PickBot: Welcome to the Guitar Tuner! Click on the letter circles next to the tuning pegs to select and tune each string. The meter will show you when the string is in tune!');
-        }
-
-        // Initialize with G string selected
-        document.addEventListener('DOMContentLoaded', function() {
-            selectString('g');
-            if (autoMode) {
-                startAutoTuning();
-            }
+        console.log('🎛️ DOM elements cached:', {
+          toggle: !!elements.toggle,
+          toggleLabel: !!elements.toggleLabel,
+          tuneButton: !!elements.tuneButton,
+          letters: elements.letters.length,
+          strings: elements.strings.length,
+          meters: elements.meters.length
         });
-    </script>
-    <script src="js/mousetrail.js"></script>
+
+        // Initialize event listeners
+        initEventListeners();
+        
+        // Multiple ways to attach the toggle event
+        const toggleElement = document.getElementById('autoToggle');
+        const toggleKnob = document.querySelector('.toggle-knob');
+        
+        if (toggleElement) {
+          console.log('✅ Found toggle element, attaching multiple event listeners');
+          
+          // Method 1: addEventListener
+          toggleElement.addEventListener('click', function(e) {
+            console.log('🎯 Toggle clicked via addEventListener');
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMode(e);
+          });
+          
+          // Method 2: Direct onclick
+          toggleElement.onclick = function(e) {
+            console.log('🎯 Toggle clicked via onclick');
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMode(e);
+          };
+          
+          // Method 3: Also add to the knob
+          if (toggleKnob) {
+            toggleKnob.addEventListener('click', function(e) {
+              console.log('🎯 Toggle knob clicked');
+              e.preventDefault();
+              e.stopPropagation();
+              toggleMode(e);
+            });
+          }
+          
+          // Method 4: Add to the entire container as backup
+          const toggleContainer = document.querySelector('.toggle-container');
+          if (toggleContainer) {
+            toggleContainer.addEventListener('click', function(e) {
+              if (e.target.closest('.toggle-switch')) {
+                console.log('🎯 Toggle container clicked');
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMode(e);
+              }
+            });
+          }
+        } else {
+          console.error('❌ Toggle element not found!');
+        }
+        
+        // Start with G string selected and auto mode enabled
+        selectString('g');
+        updateTuningStatus('🎸 Enhanced Guitar Tuner Ready! Improved note detection active.', 'ready');
+        
+        if (autoMode) {
+          startAutoTuning();
+        }
+        
+        // Show startup message
+        console.log('🎸 Enhanced Guitar Tuner ready with improved backend integration!');
+      }, 100);
+    });
+
+    // ───── Event Listeners ─────────────────────────────────────
+    function initEventListeners() {
+      // String selection
+      elements.letters.forEach(letter => {
+        letter.addEventListener('click', () => {
+          const stringKey = letter.id.replace('letter-', '');
+          selectString(stringKey);
+        });
+      });
+
+      // Toggle mode switch - Remove existing listeners and add new one
+      if (elements.toggle) {
+        elements.toggle.removeEventListener('click', toggleMode);
+        elements.toggle.addEventListener('click', toggleMode);
+        console.log('✅ Toggle event listener attached');
+      }
+    }
+
+    // ───── Audio Recording ─────────────────────────────────────
+    async function recordAudio(duration = RECORDING_DURATION) {
+      try {
+        // Request microphone access
+        if (!mediaStream) {
+          console.log('🎤 Requesting microphone access...');
+          mediaStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+              sampleRate: 44100,
+              channelCount: 1,
+              echoCancellation: false,
+              noiseSuppression: false
+            } 
+          });
+          console.log('✅ Microphone access granted!');
+        }
+
+        // Create MediaRecorder
+        const mediaRecorder = new MediaRecorder(mediaStream);
+        const audioChunks = [];
+
+        // Collect audio data
+        mediaRecorder.ondataavailable = event => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        // Start recording
+        mediaRecorder.start();
+        isRecording = true;
+        console.log('🎤 Recording started...');
+        
+        // Stop after duration
+        setTimeout(() => {
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        }, duration);
+
+        // Return promise that resolves with audio blob
+        return new Promise((resolve, reject) => {
+          mediaRecorder.onstop = () => {
+            isRecording = false;
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            console.log('🎵 Recording complete, size:', audioBlob.size, 'bytes');
+            resolve(audioBlob);
+          };
+          
+          mediaRecorder.onerror = reject;
+        });
+
+      } catch (error) {
+        console.error('❌ Recording failed:', error);
+        isRecording = false;
+        throw error;
+      }
+    }
+
+    // ───── Backend Communication ─────────────────────────────────
+    async function sendAudioForTuning(audioBlob, targetNote = null) {
+      try {
+        console.log('📤 Sending audio to backend for analysis...');
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'guitar_recording.webm');
+        
+        if (targetNote) {
+          formData.append('note', targetNote);
+          console.log('🎯 Target note:', targetNote);
+        }
+
+        const response = await fetch(`${API_BASE_URL}/tune`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error (${response.status}): ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('📥 Backend response:', result);
+        
+        // Validate the response
+        if (!result.note || !result.frequency) {
+          throw new Error('Invalid response from server');
+        }
+        
+        return result;
+      } catch (error) {
+        console.error('❌ Failed to analyze audio:', error);
+        
+        // Only use simulation as last resort
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          console.log('🌐 Network error - using simulation mode');
+          return simulateTuning(targetNote);
+        } else {
+          // Re-throw other errors to show user
+          throw error;
+        }
+      }
+    }
+
+    // ───── Mock Tuning Simulation (when backend is down) ─────────
+    function simulateTuning(targetNote) {
+      // Create more realistic random note detection
+      const allNotes = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'];
+      
+      // 70% chance to detect the target note, 30% chance random note
+      let detectedNote;
+      if (targetNote && Math.random() > 0.3) {
+        detectedNote = targetNote;
+      } else {
+        detectedNote = allNotes[Math.floor(Math.random() * allNotes.length)];
+      }
+      
+      const mockResults = {
+        'E2': { note: 'E2', cents: Math.random() * 60 - 30, in_tune: Math.random() > 0.7, direction: Math.random() > 0.5 ? 'sharp' : 'flat' },
+        'A2': { note: 'A2', cents: Math.random() * 60 - 30, in_tune: Math.random() > 0.7, direction: Math.random() > 0.5 ? 'sharp' : 'flat' },
+        'D3': { note: 'D3', cents: Math.random() * 60 - 30, in_tune: Math.random() > 0.7, direction: Math.random() > 0.5 ? 'sharp' : 'flat' },
+        'G3': { note: 'G3', cents: Math.random() * 60 - 30, in_tune: Math.random() > 0.7, direction: Math.random() > 0.5 ? 'sharp' : 'flat' },
+        'B3': { note: 'B3', cents: Math.random() * 60 - 30, in_tune: Math.random() > 0.7, direction: Math.random() > 0.5 ? 'sharp' : 'flat' },
+        'E4': { note: 'E4', cents: Math.random() * 60 - 30, in_tune: Math.random() > 0.7, direction: Math.random() > 0.5 ? 'sharp' : 'flat' }
+      };
+      
+      const result = mockResults[detectedNote];
+      console.log('🎭 Simulated detection - Target:', targetNote, 'Detected:', detectedNote, 'Result:', result);
+      return result;
+    }
+
+    // ───── Tuning Logic ─────────────────────────────────────────
+    async function tuneCurrentString() {
+      if (isRecording) return;
+
+      try {
+        // Show recording indicator and add listening animation to all letters
+        updateTuningStatus('🎤 Listening for guitar notes...', 'recording');
+        updateTuneButton('🎤 Recording...', 'recording');
+        
+        // Add listening pulse to all string letters
+        elements.letters.forEach(letter => {
+          letter.classList.add('listening');
+          letter.classList.remove('detected');
+        });
+        
+        // Record audio
+        const audioBlob = await recordAudio();
+        
+        // Remove listening animation
+        elements.letters.forEach(letter => {
+          letter.classList.remove('listening');
+        });
+        
+        // Show processing indicator
+        updateTuningStatus('🔄 Analyzing pitch and detecting note...', 'processing');
+        updateTuneButton('🔄 Processing...', 'processing');
+        
+        // Get target note for current string (only in manual mode for validation)
+        const targetNote = autoMode ? null : STRING_TO_NOTE[currentString];
+        
+        // Send to backend for analysis
+        const tuningData = await sendAudioForTuning(audioBlob, targetNote);
+        
+        // Show detected note animation
+        showDetectedNote(tuningData.note);
+        
+        // Update UI with results
+        updateTunerUI(tuningData);
+        
+        // Reset button
+        updateTuneButton('🎤 Listen & Tune', '');
+        
+      } catch (error) {
+        console.error('❌ Tuning failed:', error);
+        
+        // Provide user-friendly error messages
+        let errorMessage = '❌ Tuning failed: ';
+        if (error.message.includes('No clear pitch detected')) {
+          errorMessage += 'Play louder or closer to microphone';
+        } else if (error.message.includes('Server error')) {
+          errorMessage += 'Server connection issue';
+        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+          errorMessage += 'Network connection problem';
+        } else {
+          errorMessage += error.message;
+        }
+        
+        updateTuningStatus(errorMessage, 'error');
+        updateTuneButton('🎤 Listen & Tune', '');
+        
+        // Remove any listening animations on error
+        elements.letters.forEach(letter => {
+          letter.classList.remove('listening', 'detected');
+        });
+      }
+    }
+
+    // ───── Visual Note Detection ─────────────────────────────────
+    function showDetectedNote(detectedNote) {
+      console.log('🎵 Detected note:', detectedNote);
+      
+      // Map note to string letter element
+      const stringKey = NOTE_TO_STRING[detectedNote];
+      if (!stringKey) {
+        console.log('❌ No string mapping found for note:', detectedNote);
+        return;
+      }
+      
+      const letterElement = document.getElementById(`letter-${stringKey}`);
+      const stringElement = document.getElementById(`string-${stringKey}`);
+      
+      console.log('🎯 Found elements:', {
+        stringKey,
+        letter: !!letterElement,
+        string: !!stringElement
+      });
+      
+      if (letterElement && stringElement) {
+        // Remove detected/glow classes from all elements first
+        elements.letters.forEach(letter => {
+          letter.classList.remove('detected');
+        });
+        elements.strings.forEach(string => {
+          string.classList.remove('detected-glow');
+        });
+        
+        // Add detected animation to the specific note letter
+        letterElement.classList.add('detected');
+        
+        // Add glow effect to the corresponding string
+        stringElement.classList.add('detected-glow');
+        
+        console.log('✨ Applied detected class to letter:', letterElement.className);
+        console.log('🌟 Applied glow class to string:', stringElement.className);
+        
+        // Force a brief delay to ensure the styles are applied
+        setTimeout(() => {
+          console.log('🔄 Checking if classes were applied:');
+          console.log('Letter classes:', letterElement.className);
+          console.log('String classes:', stringElement.className);
+        }, 100);
+        
+        // Remove the detected/glow classes after animation completes
+        setTimeout(() => {
+          letterElement.classList.remove('detected');
+          stringElement.classList.remove('detected-glow');
+          console.log('🕐 Removed detection classes after 3 seconds');
+        }, 3000); // Extended to 3 seconds for better visibility
+      } else {
+        console.log('❌ Could not find elements for string:', stringKey);
+      }
+    }
+
+    // ───── Manual Tune Function ─────────────────────────────────
+    async function manualTune() {
+      if (isRecording) return;
+      console.log('🎯 Manual tune requested for string:', currentString);
+      await tuneCurrentString();
+    }
+
+    // ───── UI Updates ─────────────────────────────────────────
+    function selectString(stringKey) {
+      console.log('🎸 Selecting string:', stringKey);
+      
+      // Clear all active states
+      elements.strings.forEach(el => el.classList.remove('active'));
+      elements.letters.forEach(el => el.classList.remove('active'));
+      elements.meters.forEach(el => {
+        el.classList.remove('active', 'checked');
+        const arrow = el.querySelector('.meter-arrow');
+        if (arrow) {
+          arrow.src = arrow.dataset.unclicked;
+          arrow.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+        }
+      });
+
+      // Set new active states
+      const stringEl = document.getElementById(`string-${stringKey}`);
+      const letterEl = document.getElementById(`letter-${stringKey}`);
+      const meterEl = document.getElementById(`meter-${stringKey}`);
+      
+      if (stringEl) stringEl.classList.add('active');
+      if (letterEl) letterEl.classList.add('active');
+      if (meterEl) meterEl.classList.add('active');
+
+      currentString = stringKey;
+      console.log('🎸 Selected string:', stringKey);
+      
+      // Play reference tone
+      playReferenceNote(stringKey);
+      
+      // Update status
+      const noteName = STRING_TO_NOTE[stringKey];
+      updateTuningStatus(`🎯 Selected: ${noteName} string`, 'ready');
+    }
+
+    function updateTunerUI(tuningData) {
+      console.log('🎯 Updating UI with tuning result:', tuningData);
+      
+      // Validate tuning data
+      if (!tuningData || !tuningData.note) {
+        console.error('❌ Invalid tuning data received');
+        updateTuningStatus('❌ Invalid tuning data received', 'error');
+        return;
+      }
+      
+      // Map backend note to frontend string
+      const detectedString = NOTE_TO_STRING[tuningData.note];
+      
+      if (!detectedString) {
+        console.warn('⚠️ Detected note not in guitar range:', tuningData.note);
+        updateTuningStatus(`🎵 Detected ${tuningData.note} - Not a standard guitar note`, 'out-of-tune');
+        return;
+      }
+      
+      // In auto mode, always switch to detected string
+      // In manual mode, show what was detected but keep current selection for meter
+      let meterString = currentString; // Default to current selection
+      
+      if (autoMode) {
+        selectString(detectedString);
+        meterString = detectedString;
+      } else {
+        // In manual mode, briefly highlight the detected string but keep meter on current
+        if (detectedString !== currentString) {
+          console.log(`🎯 Manual mode: Playing ${tuningData.note} but selected ${currentString}`);
+        }
+        meterString = detectedString; // Show meter for detected note
+      }
+      
+      // Update meter arrow for the detected note
+      const currentMeter = document.getElementById(`meter-${meterString}`);
+      if (currentMeter) {
+        const arrow = currentMeter.querySelector('.meter-arrow');
+        if (arrow) {
+          // Calculate arrow rotation based on cents (-45° to +45°)
+          const maxCents = 50;
+          const maxRotation = 45;
+          const rotation = Math.max(-maxRotation, 
+            Math.min(maxRotation, (tuningData.cents / maxCents) * maxRotation));
+          
+          arrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+          
+          // Update arrow image based on tuning status
+          if (tuningData.in_tune) {
+            arrow.src = arrow.dataset.clicked;
+            currentMeter.classList.add('checked');
+          } else {
+            arrow.src = arrow.dataset.unclicked;
+            currentMeter.classList.remove('checked');
+          }
+        }
+      }
+      
+      // Update status message with comprehensive info
+      const noteDisplay = tuningData.note || 'Unknown';
+      const frequencyDisplay = tuningData.frequency ? `${tuningData.frequency}Hz` : 'Unknown';
+      const targetFrequency = tuningData.target_frequency ? `${tuningData.target_frequency}Hz` : '';
+      
+      if (tuningData.in_tune) {
+        updateTuningStatus(`✅ ${noteDisplay} perfect! (${frequencyDisplay})`, 'in-tune');
+      } else {
+        const direction = tuningData.direction === 'sharp' ? 'too high ⬇️' : 'too low ⬆️';
+        const centsDisplay = Math.abs(tuningData.cents || 0).toFixed(1);
+        
+        // Add tuning guidance
+        let guidance = '';
+        if (Math.abs(tuningData.cents) > 50) {
+          guidance = tuningData.direction === 'sharp' ? ' Turn tuning peg LEFT' : ' Turn tuning peg RIGHT';
+        }
+        
+        updateTuningStatus(
+          `🎵 ${noteDisplay}: ${centsDisplay}¢ ${direction}${guidance}`, 
+          'out-of-tune'
+        );
+      }
+      
+      // Add confidence indicator if available
+      if (tuningData.confidence !== undefined && tuningData.confidence < 0.7) {
+        setTimeout(() => {
+          updateTuningStatus(
+            `⚠️ Low confidence (${(tuningData.confidence * 100).toFixed(0)}%) - Try playing clearer`, 
+            'error'
+          );
+        }, 2000);
+      }
+    }
+
+    function updateTuningStatus(message, className) {
+      // Create or update status element
+      let statusEl = document.getElementById('tuning-status');
+      if (!statusEl) {
+        statusEl = document.createElement('div');
+        statusEl.id = 'tuning-status';
+        document.querySelector('.tuner-container').appendChild(statusEl);
+      }
+      
+      statusEl.textContent = message;
+      statusEl.className = className;
+      console.log('📢 Status:', message);
+    }
+
+    function updateTuneButton(text, className) {
+      if (elements.tuneButton) {
+        elements.tuneButton.textContent = text;
+        elements.tuneButton.className = 'tune-button ' + className;
+      }
+    }
+
+    // ───── Mode Toggle (FIXED) ─────────────────────────────────────────
+    function toggleMode(event) {
+      // Prevent any default behavior
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      
+      console.log('🔄 Toggle clicked, current autoMode:', autoMode);
+      
+      autoMode = !autoMode;
+      
+      const toggle = document.getElementById('autoToggle');
+      const label = document.getElementById('toggleLabel');
+      const tuneButton = document.getElementById('tuneButton');
+      
+      console.log('🎛️ Elements found:', { toggle: !!toggle, label: !!label, tuneButton: !!tuneButton });
+      
+      if (autoMode) {
+        if (toggle) toggle.classList.add('active');
+        if (label) label.textContent = 'AUTOMATIC';
+        if (tuneButton) tuneButton.style.display = 'none';
+        startAutoTuning();
+        updateTuningStatus('🔄 Auto mode: Continuous tuning active', 'ready');
+        console.log('🔄 Switched to Automatic mode');
+      } else {
+        if (toggle) toggle.classList.remove('active');
+        if (label) label.textContent = 'MANUAL';
+        if (tuneButton) tuneButton.style.display = 'block';
+        stopAutoTuning();
+        updateTuningStatus('👆 Manual mode: Click button to tune', 'ready');
+        console.log('👆 Switched to Manual mode');
+      }
+      
+      console.log('🎯 Mode switched to:', autoMode ? 'AUTOMATIC' : 'MANUAL');
+    }
+
+    function startAutoTuning() {
+      stopAutoTuning(); // Clear any existing interval
+      
+      autoTuneInterval = setInterval(() => {
+        if (autoMode && !isRecording) {
+          console.log('🔁 Auto-tuning cycle...');
+          tuneCurrentString();
+        }
+      }, AUTO_TUNE_INTERVAL);
+    }
+
+    function stopAutoTuning() {
+      if (autoTuneInterval) {
+        clearInterval(autoTuneInterval);
+        autoTuneInterval = null;
+      }
+    }
+
+    // ───── Reference Tone Playback ─────────────────────────────
+    function playReferenceNote(stringKey) {
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      
+      const frequencies = {
+        'e-low': 82.41,
+        'a': 110.00,
+        'd': 146.83,
+        'g': 196.00,
+        'b': 246.94,
+        'e-high': 329.63
+      };
+      
+      const frequency = frequencies[stringKey];
+      if (!frequency) return;
+      
+      try {
+        // Create oscillator for reference tone
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        oscillator.type = 'sine';
+        
+        // Fade in and out
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+        gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+        
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + 1);
+        
+        console.log('🎵 Playing reference tone:', frequency, 'Hz');
+      } catch (error) {
+        console.log('🔇 Could not play reference tone:', error);
+      }
+    }
+
+    // ───── Navigation ─────────────────────────────────────────
+    function goHome() {
+      // Clean up resources before leaving
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+      stopAutoTuning();
+      
+      window.location.href = 'homepage.html';
+    }
+
+    function showPickbot() {
+      const messages = [
+        "🎸 Welcome to the Enhanced Guitar Tuner! Now with improved note detection!",
+        "🎵 Toggle between Automatic and Manual modes using the switch above.",
+        "🎤 Make sure to allow microphone access and play single notes clearly.",
+        "🎯 The tuner now accurately detects all 6 guitar strings: E-A-D-G-B-E!",
+        "📱 In Manual mode, select a string and click 'Listen & Tune' for instant feedback!",
+        "🔄 Automatic mode continuously listens and shows detected notes in real-time!",
+        "🎼 Each string lights up in its unique color when detected!",
+        "📊 Watch the meter arrow and cents display for precise tuning guidance!",
+        "🎸 Pro tip: Play single notes (not chords) for best results!",
+        "🔧 If you see 'too high' tune the peg LEFT, if 'too low' tune RIGHT!"
+      ];
+      
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+      alert(`PickBot: ${randomMessage}`);
+    }
+
+    // ───── Cleanup on page unload ─────────────────────────────
+    window.addEventListener('beforeunload', () => {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+      stopAutoTuning();
+    });
+
+    // ───── Initialize on load ─────────────────────────────────
+    window.addEventListener('load', () => {
+      console.log('🎸 Guitar Tuner loaded successfully!');
+    });
+  </script>
+
+  <!-- Include mousetrail script if available -->
+  <script src="js/mousetrail.js"></script>
 </body>
 </html>

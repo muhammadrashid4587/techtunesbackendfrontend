@@ -63,20 +63,64 @@ nav ul li a:hover::after {
   box-shadow: 0 6px 12px rgba(0,0,0,0.5);
   margin: 0 auto;
 }
+
+/* Center the main heading */
+#profile-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-purple), var(--white));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
 #profile-form label {
   display: block;
-  margin: 1rem 0 .25rem;
+  margin: 1rem 0 .5rem;
   color: var(--white);
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 #profile-form input,
 #profile-form select,
 #profile-form button {
   width: 100%;
-  padding: .6rem;
-  margin-bottom: 1rem;
-  border: var(--border-width) solid var(--light-gray);
-  border-radius: 4px;
+  padding: .8rem 1rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid rgba(212, 158, 251, 0.3);
+  border-radius: 8px;
   font-size: 1rem;
+  background: rgba(10, 15, 15, 0.6);
+  color: var(--white);
+  transition: all 0.3s ease;
+}
+
+#profile-form input:focus,
+#profile-form select:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(212, 158, 251, 0.2);
+  background: rgba(10, 15, 15, 0.8);
+}
+
+#profile-form input:hover,
+#profile-form select:hover {
+  border-color: var(--primary-purple);
+  background: rgba(10, 15, 15, 0.7);
+}
+
+/* Style the select dropdown arrow */
+#profile-form select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d49efb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
 }
 #profile-form button {
   background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
@@ -89,9 +133,96 @@ nav ul li a:hover::after {
   opacity: 0.9;
 }
 
+/* Fancy Customize Avatar Button */
+#edit-avatar-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 2rem auto;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple), var(--teal));
+  background-size: 200% 200%;
+  color: var(--white);
+  text-decoration: none;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  border: none;
+  box-shadow: 0 8px 25px rgba(212, 158, 251, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+#edit-avatar-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+#edit-avatar-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(212, 158, 251, 0.6);
+  background-position: 100% 100%;
+}
+
+#edit-avatar-btn:hover::before {
+  left: 100%;
+}
+
+#edit-avatar-btn:active {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 6px 20px rgba(212, 158, 251, 0.5);
+}
+
+/* Add a subtle animation to the button */
+@keyframes buttonGlow {
+  0%, 100% { box-shadow: 0 8px 25px rgba(212, 158, 251, 0.4); }
+  50% { box-shadow: 0 8px 25px rgba(212, 158, 251, 0.6), 0 0 20px rgba(212, 158, 251, 0.3); }
+}
+
+#edit-avatar-btn {
+  animation: buttonGlow 3s ease-in-out infinite;
+}
+
 #preview {
   text-align: center;
   margin-top: 2rem;
+}
+
+/* Avatar preview styling */
+#avatar-preview-container {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+#avatar-preview-container h3 {
+  color: var(--white);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+#avatar-preview {
+  max-width: 200px;
+  border: 2px solid var(--primary-purple);
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+  min-height: 200px;
+  background: rgba(10, 15, 15, 0.6);
+  transition: all 0.3s ease;
+}
+
+#avatar-preview:hover {
+  border-color: var(--white);
+  box-shadow: 0 0 15px rgba(212, 158, 251, 0.3);
 }
 
 /* -------------------------------
@@ -124,6 +255,7 @@ margin: 1rem auto;
   gap: 1rem;
   justify-content: center;
   margin-bottom: 1rem;
+
 }
 #avatar-editor label {
   display: flex;

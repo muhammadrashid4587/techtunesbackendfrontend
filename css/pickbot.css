@@ -75,7 +75,6 @@
   from { opacity: 0; transform: scale(0); }
   to   { opacity: 1; transform: scale(1); }
 }
-
 /* ─── Base leg container ─── */
 .pickbot-leg {
   position: absolute;
@@ -108,3 +107,4 @@
                       /* tweak % until it sits under right shoe */
   background-image: url("../images/right.png");
 }
+

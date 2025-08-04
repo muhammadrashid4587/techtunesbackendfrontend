@@ -51,10 +51,10 @@
         <option>Saxophone</option>
       </select>
 
-      <label for="avatar-color">Avatar Color:</label>
-      <input type="color" id="avatar-color" value="#d49efb">
+      
+      
 
-      <button type="submit">Save Profile</button>
+     
     </form>
 
     <!-- Link to full-page avatar editor -->
@@ -66,7 +66,8 @@
       <img
         id="avatar-preview"
         alt="Your avatar"
-        style="max-width:200px; border:2px solid #fff; display:block; margin:0 auto;"
+        style="max-width:200px; border:2px solid #fff; display:block; margin:0 auto; min-height:200px;"
+        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEF2YXRhciBZZXQ8L3RleHQ+PC9zdmc+"
       />
     </div>
   </main>
@@ -77,9 +78,29 @@
   <!-- load saved avatar if it exists -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const avatarPreview = document.getElementById('avatar-preview');
       const data = localStorage.getItem('savedAvatar');
-      if (data) {
-        document.getElementById('avatar-preview').src = data;
+      
+      if (data && data.startsWith('data:image')) {
+        avatarPreview.src = data;
+        console.log('Avatar loaded from localStorage');
+      } else {
+        console.log('No saved avatar found in localStorage');
+      }
+      
+      // Also load profile data if available
+      const profileData = localStorage.getItem('technoProfile');
+      if (profileData) {
+        try {
+          const profile = JSON.parse(profileData);
+          const nameInput = document.getElementById('profile-name');
+          const instSelect = document.getElementById('favorite-instrument');
+          
+          if (profile.name) nameInput.value = profile.name;
+          if (profile.inst) instSelect.value = profile.inst;
+        } catch (e) {
+          console.error('Error loading profile data:', e);
+        }
       }
     });
   </script>
