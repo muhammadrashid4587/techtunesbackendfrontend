@@ -1,258 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Avatar Creator • TechTunes</title>
-  <link rel="stylesheet" href="css/profile.css" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: url('images/Brick_Wall.png') center/cover no-repeat;
-      background-attachment: fixed;
-      overflow: hidden;
-    }
-    .container {
-      position: relative;
-      display: flex;
-      width: 100vw;
-      height: 100vh;
-    }
-    .left-panel {
-      width: 50%;
-      position: relative;
-      display: block;
-    }
-    .mirror {
-      position: relative;
-      bottom: 150px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 450px;
-      height: 1050px;
-      background: url('images/Background/Mirror@4x.png') center/contain no-repeat;
-      z-index: 1;
-    }
-    .lamp {
-      position: absolute; top: -200px; left: 50%;
-      transform: translateX(-50%);
-      width: 500px; height: 800px;
-      background: url('images/Background/Lamp Dressing Room@4x.png') center/contain no-repeat;
-      z-index: 2;
-    }
-    .stand {
-      position: absolute; bottom: -20px; left: 55%;
-      transform: translateX(-50%);
-      width: 200px; height: 400px;
-      background: url('images/Background/Stand@4x.png') center/contain no-repeat;
-      z-index: 3;
-    }
-    .floor {
-      position: fixed; bottom: 0; left: 0;
-      width: 100vw; height: auto; z-index: 0;
-    }
-
-    /* ---- AVATAR LAYERS ---- */
-    #avatar-base {
-      position: absolute; bottom: 260px;
-      left: 50%; transform: translateX(-50%);
-      width: 140px; z-index: 4; display: block;
-    }
-    #layer-hands {
-      position: absolute; bottom: 300px;
-      left: 50%; transform: translateX(-50%) scaleX(1.2);
-      width: 180px; z-index: 5;
-    }
-    #layer-eyes {
-      position: absolute; bottom: 330px;
-      left: 50%; transform: translateX(-50%);
-      width: 80px; z-index: 6;
-    }
-    #layer-mouth {
-      position: absolute; bottom: 280px;
-      left: 50%; transform: translateX(-50%);
-      width: 60px; z-index: 7;
-    }
-    #layer-accessories {
-      position: absolute; bottom: 360px;
-      left: 50%; transform: translateX(-50%);
-      width: 120px; z-index: 8;
-    }
-
-    .right-panel {
-      width: 50%;
-      display: flex; flex-direction: column;
-      align-items: center; padding-top: 30px;
-    }
-
-    /* hide empty layers */
-    .avatar-layer, .avatar-base {
-      display: none;
-    }
-    /* show only when src is set */
-    .avatar-layer[src]:not([src=""]),
-    .avatar-base[src]:not([src=""]) {
-      display: block;
-    }
-
-    .color-options {
-      display: grid;
-      grid-template-columns: repeat(4, 60px);
-      grid-auto-rows: 60px;
-      column-gap: 10px; row-gap: 10px;
-      width: calc(60px*4 + 10px*3 + 30px);
-      background: white; padding: 15px; border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .color-options > * {
-      width: 60px!important; height: 60px!important;
-      object-fit: contain; cursor: pointer;
-      border-radius: 8px; transition: transform .2s;
-    }
-    .color-options > *:hover { transform: scale(1.05); }
-    .color-options input[type="color"] {
-      -webkit-appearance: none; border: none; padding: 0;
-      width: 60px; height: 60px; border-radius: 50%;
-      background: none; cursor: pointer;
-    }
-    .color-options input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-options input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
-
-    .toolbar { display: flex; gap: 20px; }
-    .toolbar img { width: 60px; height: auto; cursor: pointer; }
-
-    #resetBtn, #saveAvatarBtn {
-      margin-top: 10px; padding: 10px 20px;
-      border: none; border-radius: 8px;
-      background: #4DB8FF; color: #fff;
-      font-size: 16px; cursor: pointer;
-      transition: background 0.2s;
-    }
-    #resetBtn:hover, #saveAvatarBtn:hover { background: #3aa8e0; }
-  </style>
-
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-
-<body>
-  <img src="images/Floor.png" class="floor" alt="floor">
-
-  <div class="container">
-    <div class="left-panel">
-      <div class="mirror">
-        <div class="lamp"></div>
-        <div class="stand"></div>
-
-
-        <img id="avatar-base" src="images/PickBotBody.png" alt="Avatar base">
-        <img id="layer-hands"       class="avatar-layer" src="" alt="Hands layer">
-        <img id="layer-eyes"        class="avatar-layer" src="" alt="Eyes layer">
-        <img id="layer-mouth"       class="avatar-layer" src="" alt="Mouth layer">
-        <img id="layer-accessories" class="avatar-layer" src="" alt="Accessory layer">
-      </div>
-    </div>
-
-    <div class="right-panel">
-      <div class="color-options" id="optionBox"></div>
-      <div class="toolbar">
-        <img src="images/Background/Hands Button@4x.png"
-             onclick="setOption('hands')" alt="Hands">
-        <img src="images/Background/Eyes Button@4x.png"
-             onclick="setOption('eyes')" alt="Eyes">
-        <img src="images/Background/Mouth Button@4x.png"
-             onclick="setOption('mouth')" alt="Mouth">
-        <img src="images/Background/Accessory Button@4x.png"
-             onclick="setOption('accessories')" alt="Accessories">
-        <img src="images/Background/Body Button@4x.png"
-             onclick="setOption('body')" alt="Color">
-      </div>
-      <button id="resetBtn" onclick="resetAvatar()">Reset</button>
-      <button id="saveAvatarBtn">Save &amp; Return</button>
-    </div>
-  </div>
-
-  <script>
-    const folderMap = {
-      hands: 'Hands',
-      eyes: 'Eyes',
-      mouth: 'Mouth',
-      accessories: 'Accessories'
-    };
-    const files = {
-      hands: ['Base Hands@4x.png','Bent Hands@4x.png','Down Hands@4x.png','Raise and Bent Hands@4x.png','Up Hands@4x.png'],
-      eyes:  ['Base Eyes@4x.png','Eyelash Eyes@4x.png','Eyeliner Eyes@4x.png','Half Eyes@4x.png'],
-      mouth: ['Base Mouth@4x.png','Half Smile Mouth@4x.png','Lips Mouth@4x.png','Smile Mouth@4x.png','Smirk Mouth@4x.png','Toungue Mouth@4x.png'],
-      accessories: ['Beanie@4x.png','Bow@4x.png','Cowboy Hat@4x.png','Crown@4x.png','Hat@4x.png','Party Hat@4x.png','Purse@4x.png','binoculars@4x.png','braids@4x.png','glasses@4x.png','necklace@4x.png','swoop hair@4x.png','tie@4x.png']
-    };
-
-    function setOption(category) {
-      const box = document.getElementById('optionBox');
-      box.innerHTML = '';
-      if (category === 'body') {
-        const picker = document.createElement('input');
-        picker.type  = 'color';
-        picker.value = '#ffffff';
-        picker.oninput = e => {
-          document.getElementById('avatar-base').style.filter =
-            `brightness(1) sepia(1) hue-rotate(${hexToHue(e.target.value)}deg)`;
-        };
-        box.appendChild(picker);
-        return;
-      }
-      files[category].forEach(file => {
-        const img = document.createElement('img');
-        img.src = `images/Choice Elements/${folderMap[category]}/${file}`;
-        img.alt = file;
-        img.onclick = () => {
-          document.getElementById(`layer-${category}`).src = img.src;
-        };
-        box.appendChild(img);
-      });
-    }
-
-    function resetAvatar() {
-      document.getElementById('avatar-base').style.filter = 'none';
-      ['hands','eyes','mouth','accessories'].forEach(cat => {
-        document.getElementById(`layer-${cat}`).src = '';
-      });
-      setOption('body');
-    }
-
-    function hexToHue(hex) {
-      hex = hex.replace('#','');
-      const r = parseInt(hex.substr(0,2),16)/255;
-      const g = parseInt(hex.substr(2,2),16)/255;
-      const b = parseInt(hex.substr(4,2),16)/255;
-      const mx = Math.max(r,g,b), mn = Math.min(r,g,b);
-      let h = 0;
-      if (mx !== mn) {
-        if (mx === r)      h = ((g - b)/(mx - mn))*60;
-        else if (mx === g) h = ((b - r)/(mx - mn))*60 + 120;
-        else               h = ((r - g)/(mx - mn))*60 + 240;
-      }
-      return (h + 360) % 360;
-    }
-
-    window.onload = () => setOption('body');
-
-    document.getElementById('saveAvatarBtn').addEventListener('click', () => {
-      html2canvas(document.querySelector('.mirror'), { backgroundColor: null })
-        .then(canvas => {
-          localStorage.setItem('savedAvatar', canvas.toDataURL('image/png'));
-          location.href = 'profile.html';
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Sorry, could not save your avatar.');
-        });
-    });
-  </script>
-</body>
-</html> -->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -285,8 +30,8 @@
       left: 50%;
       transform: translateX(-50%);
       width: 450px;
-      height: 1050px;
-      background: url('images/Background/Mirror@4x.png') center/contain no-repeat;
+      height: 1100px;
+      background: url('images/Background/mirror.png') center/contain no-repeat;
       z-index: 1;
     }
     .lamp {
@@ -297,23 +42,61 @@
       z-index: 2;
     }
     .stand {
-      position: absolute; bottom: -20px; left: 55%;
+      position: absolute; bottom: -20px; left: 57%; 
       transform: translateX(-50%);
-      width: 200px; height: 400px;
+      width: 200px; height: 325px;
       background: url('images/Background/Stand@4x.png') center/contain no-repeat;
-      z-index: 3;
+      z-index: 2;
     }
     .floor {
       position: fixed; bottom: 0; left: 0;
       width: 100vw; height: auto; z-index: 0;
     }
+    .wheel-wrap {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+    }
+    .wheel-pointer {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -12px;
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 24px solid #fff;
+      z-index: 5;
+      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35));
+    }
+    .wheel-pointer::after {
+      content: "";
+      position: absolute;
+      left: -9px;
+      top: 4px;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-bottom: 18px solid #e74c3c;
+    }
 
     /* ---- AVATAR LAYERS ---- */
     #avatar-base {
-      position: absolute; bottom: 260px;
-      left: 50%; transform: translateX(-50%);
-      width: 140px; z-index: 4; display: block;
+      position: absolute; 
+      bottom: 200px;
+      left: 50%; 
+      transform: translateX(-50%);
+      width: 220px; 
+      height: 300px;
+      z-index: 4;
+      background-color: #ffffff;
+      mask-image: url("images/ogbot.png");
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
     }
+
     #layer-hands {
       position: absolute; bottom: 300px;
       left: 50%; transform: translateX(-50%) scaleX(1.2);
@@ -341,40 +124,7 @@
       align-items: center; padding-top: 30px;
     }
 
-    /* hide empty layers */
-    .avatar-layer, .avatar-base {
-      display: none;
-    }
-    /* show only when src is set */
-    .avatar-layer[src]:not([src=""]),
-    .avatar-base[src]:not([src=""]) {
-      display: block;
-    }
-
-    .color-options {
-      display: grid;
-      grid-template-columns: repeat(4, 60px);
-      grid-auto-rows: 60px;
-      column-gap: 10px; row-gap: 10px;
-      width: calc(60px*4 + 10px*3 + 30px);
-      background: white; padding: 15px; border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .color-options > * {
-      width: 60px!important; height: 60px!important;
-      object-fit: contain; cursor: pointer;
-      border-radius: 8px; transition: transform .2s;
-    }
-    .color-options > *:hover { transform: scale(1.05); }
-    .color-options input[type="color"] {
-      -webkit-appearance: none; border: none; padding: 0;
-      width: 60px; height: 60px; border-radius: 50%;
-      background: none; cursor: pointer;
-    }
-    .color-options input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-options input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
-
-    .toolbar { display: flex; gap: 20px; }
+    .toolbar { display: flex; gap: 20px; margin-top: 20px; }
     .toolbar img { width: 60px; height: auto; cursor: pointer; }
 
     #resetBtn, #saveAvatarBtn {
@@ -385,9 +135,22 @@
       transition: background 0.2s;
     }
     #resetBtn:hover, #saveAvatarBtn:hover { background: #3aa8e0; }
-  </style>
 
-  <!-- html2canvas WITHOUT integrity/CORS so it actually loads -->
+    /* Options container */
+    #optionBox {
+      display: flex; flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 15px 0;
+    }
+    #optionBox img {
+      width: 60px; height: 60px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.2s;
+    }
+    #optionBox img:hover { transform: scale(1.1); }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
@@ -400,28 +163,33 @@
         <div class="lamp"></div>
         <div class="stand"></div>
 
-        <!-- blank-note base + layers -->
-        <img id="avatar-base" src="" alt="Avatar base">
-        <img id="layer-hands"       class="avatar-layer" src="" alt="Hands layer">
-        <img id="layer-eyes"        class="avatar-layer" src="" alt="Eyes layer">
-        <img id="layer-mouth"       class="avatar-layer" src="" alt="Mouth layer">
-        <img id="layer-accessories" class="avatar-layer" src="" alt="Accessory layer">
+        <!-- Base & Layers -->
+        <div id="avatar-base"></div>
+        <img id="layer-hands"       class="avatar-layer" src="" alt="">
+        <img id="layer-eyes"        class="avatar-layer" src="" alt="">
+        <img id="layer-mouth"       class="avatar-layer" src="" alt="">
+        <img id="layer-accessories" class="avatar-layer" src="" alt="">
       </div>
     </div>
 
     <div class="right-panel">
-      <div class="color-options" id="optionBox"></div>
+      <!-- Spin Wheel -->
+      <div style="text-align:center; margin:20px;">
+        <div class="wheel-wrap">
+          <canvas id="colorWheel" width="300" height="300"></canvas>
+          <div class="wheel-pointer"></div>
+        </div>
+        <button id="spinBtn" style="margin-top:15px; padding:10px 20px;">Spin</button>
+      </div>
+
+      <!-- Options for accessories -->
+      <div id="optionBox"></div>
+
       <div class="toolbar">
-        <img src="images/Background/Hands Button@4x.png"
-             onclick="setOption('hands')" alt="Hands">
-        <img src="images/Background/Eyes Button@4x.png"
-             onclick="setOption('eyes')" alt="Eyes">
-        <img src="images/Background/Mouth Button@4x.png"
-             onclick="setOption('mouth')" alt="Mouth">
-        <img src="images/Background/Accessory Button@4x.png"
-             onclick="setOption('accessories')" alt="Accessories">
-        <img src="images/Background/Body Button@4x.png"
-             onclick="setOption('body')" alt="Color">
+        <img src="images/Background/Hands Button@4x.png" onclick="setOption('hands')" alt="Hands">
+        <img src="images/Background/Eyes Button@4x.png" onclick="setOption('eyes')" alt="Eyes">
+        <img src="images/Background/Mouth Button@4x.png" onclick="setOption('mouth')" alt="Mouth">
+        <img src="images/Background/Accessory Button@4x.png" onclick="setOption('accessories')" alt="Accessories">
       </div>
       <button id="resetBtn" onclick="resetAvatar()">Reset</button>
       <button id="saveAvatarBtn">Save &amp; Return</button>
@@ -429,12 +197,8 @@
   </div>
 
   <script>
-    const folderMap = {
-      hands: 'Hands',
-      eyes: 'Eyes',
-      mouth: 'Mouth',
-      accessories: 'Accessories'
-    };
+    // Categories & Files
+    const folderMap = { hands: 'Hands', eyes: 'Eyes', mouth: 'Mouth', accessories: 'Accessories' };
     const files = {
       hands: ['Base Hands@4x.png','Bent Hands@4x.png','Down Hands@4x.png','Raise and Bent Hands@4x.png','Up Hands@4x.png'],
       eyes:  ['Base Eyes@4x.png','Eyelash Eyes@4x.png','Eyeliner Eyes@4x.png','Half Eyes@4x.png'],
@@ -442,67 +206,133 @@
       accessories: ['Beanie@4x.png','Bow@4x.png','Cowboy Hat@4x.png','Crown@4x.png','Hat@4x.png','Party Hat@4x.png','Purse@4x.png','binoculars@4x.png','braids@4x.png','glasses@4x.png','necklace@4x.png','swoop hair@4x.png','tie@4x.png']
     };
 
+    // Function to get accessory adjustments
+    function getAccessoryAdjustments() {
+      try { 
+        return JSON.parse(localStorage.getItem('accessory_adjustments')) || {}; 
+      }
+      catch { 
+        return {}; 
+      }
+    }
+
+    // Apply saved offsets to #layer-accessories based on the chosen filename
+    function applyAccessoryAdjustments(fileName) {
+      const adj = getAccessoryAdjustments()[fileName] || { dx:0, dy:0, scale:1 };
+      const layer = document.getElementById('layer-accessories');
+      // Keep your original anchor (left:50%, bottom set in CSS), then add dx/dy/scale
+      layer.style.transform = `translateX(-50%) translate(${adj.dx}px, ${adj.dy}px) scale(${adj.scale})`;
+    }
+
+    // Show options
     function setOption(category) {
       const box = document.getElementById('optionBox');
       box.innerHTML = '';
-      if (category === 'body') {
-        const picker = document.createElement('input');
-        picker.type  = 'color';
-        picker.value = '#ffffff';
-        picker.oninput = e => {
-          document.getElementById('avatar-base').style.filter =
-            `brightness(1) sepia(1) hue-rotate(${hexToHue(e.target.value)}deg)`;
-        };
-        box.appendChild(picker);
-        return;
-      }
       files[category].forEach(file => {
         const img = document.createElement('img');
         img.src = `images/Choice Elements/${folderMap[category]}/${file}`;
         img.alt = file;
         img.onclick = () => {
-          document.getElementById(`layer-${category}`).src = img.src;
+          const layer = document.getElementById(`layer-${category}`);
+          layer.src = img.src;
+
+          // Fixed typo: 'acessories' -> 'accessories'
+          if (category === 'accessories') {
+            const fileName = file;
+            applyAccessoryAdjustments(fileName);
+          }
         };
         box.appendChild(img);
       });
     }
 
+    // Reset avatar
     function resetAvatar() {
-      document.getElementById('avatar-base').style.filter = 'none';
+      document.getElementById('avatar-base').style.backgroundColor = '#ffffff';
       ['hands','eyes','mouth','accessories'].forEach(cat => {
         document.getElementById(`layer-${cat}`).src = '';
       });
-      setOption('body');
     }
 
-    function hexToHue(hex) {
-      hex = hex.replace('#','');
-      const r = parseInt(hex.substr(0,2),16)/255;
-      const g = parseInt(hex.substr(2,2),16)/255;
-      const b = parseInt(hex.substr(4,2),16)/255;
-      const mx = Math.max(r,g,b), mn = Math.min(r,g,b);
-      let h = 0;
-      if (mx !== mn) {
-        if (mx === r)      h = ((g - b)/(mx - mn))*60;
-        else if (mx === g) h = ((b - r)/(mx - mn))*60 + 120;
-        else               h = ((r - g)/(mx - mn))*60 + 240;
-      }
-      return (h + 360) % 360;
-    }
-
-    window.onload = () => setOption('body');
-
-    // Save & Return → snapshot the mirror and store in localStorage
+    // Save avatar
     document.getElementById('saveAvatarBtn').addEventListener('click', () => {
-      html2canvas(document.querySelector('.mirror'), { backgroundColor: null })
+      const mirror = document.querySelector('.mirror');
+      html2canvas(mirror, { backgroundColor: null, useCORS: true, allowTaint: true, scale: 2 })
         .then(canvas => {
-          localStorage.setItem('savedAvatar', canvas.toDataURL('image/png'));
+          const dataUrl = canvas.toDataURL('image/png');
+          localStorage.setItem('savedAvatar', dataUrl);
           location.href = 'profile.html';
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Sorry, could not save your avatar.');
         });
+    });
+
+    // Spin Color Wheel
+    const colors = ["#ff0000","#00ff00","#0000ff","#ffff00","#ff00ff","#00ffff","#ff8000","#8000ff","#ffffff"];
+    const canvas = document.getElementById("colorWheel");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    let startAngle = 0;
+    const arc = (2 * Math.PI) / colors.length;
+    const TAU = Math.PI * 2;
+    const POINTER_ANGLE = -Math.PI / 2; // arrow at top (12 o'clock)
+
+    function norm(a){ a = a % TAU; return a < 0 ? a + TAU : a; }
+
+    function highlightSlice(index){
+      ctx.save();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.moveTo(150,150);
+      ctx.arc(150,150,150, startAngle + index*arc, startAngle + (index+1)*arc);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawWheel() {
+      for (let i = 0; i < colors.length; i++) {
+        ctx.beginPath();
+        ctx.fillStyle = colors[i];
+        ctx.moveTo(150, 150);
+        ctx.arc(150, 150, 150, startAngle + i * arc, startAngle + (i + 1) * arc);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+    drawWheel();
+
+    let spinAngle = 0, spinVelocity = 0, spinning = false;
+    function spin() {
+      if (spinning) {
+        spinAngle += spinVelocity;
+        spinVelocity *= 0.98;
+        if (spinVelocity < 0.01) spinning = false;
+        startAngle += spinAngle * Math.PI / 180;
+        ctx.clearRect(0, 0, 300, 300);
+        drawWheel();
+        requestAnimationFrame(spin);
+      } else {
+        const rel = norm(POINTER_ANGLE - startAngle);
+        const EPS = 1e-6;    
+        const selectedIndex = Math.floor((rel + EPS) / arc);
+        const selectedColor = colors[selectedIndex];
+
+        startAngle = norm(POINTER_ANGLE - (selectedIndex + 0.5) * arc);
+        ctx.clearRect(0, 0, 300, 300);
+        drawWheel();
+        highlightSlice(selectedIndex);
+
+        document.getElementById("avatar-base").style.backgroundColor = selectedColor;
+      }
+    }
+
+    spinBtn.addEventListener("click", () => {
+      if (!spinning) {
+        spinAngle = 0;
+        spinVelocity = Math.random() * 20 + 10;
+        spinning = true;
+        spin();
+      }
     });
   </script>
 </body>
