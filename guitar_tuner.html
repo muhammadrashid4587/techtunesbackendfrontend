@@ -117,6 +117,20 @@
       transition: all 0.3s ease;
     }
 
+    /* ───── quality panel ─────────────────────────────────────── */
+    .quality-panel {
+      position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 12px; border-radius: 999px;
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .level-bar { width: 160px; height: 10px; border-radius: 999px; background: rgba(255,255,255,0.15); overflow: hidden; }
+    .level-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#51cf66,#ffd43b,#ff6b6b); transition: width .12s ease; }
+    .confidence-badge { font-weight: 800; color:#fff; font-size: 12px; opacity: 0.9; min-width: 70px; text-align: right; }
+
     /* ───── headstock & strings ───────────────────────────────── */
     .guitar-container {
       position: absolute; top: 50%; left: 50%;
@@ -383,6 +397,33 @@
       text-align: center;
     }
 
+    /* Detected note chip */
+    #detected-chip {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.95);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      color: #0b0820;
+      background: #ef09d0;
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: 0 10px 30px rgba(239,9,208,0.35);
+      z-index: 120;
+      opacity: 0;
+      transition: opacity .18s ease, transform .18s ease, filter .18s ease;
+      pointer-events: none;
+    }
+    #detected-chip.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+      filter: brightness(1.03);
+    }
+    #detected-chip.in-tune { background: #51cf66; color: #062010; }
+    #detected-chip.out { background: #ffd43b; color: #3a2a00; }
+
     .recording { color: #ff6b6b; }
     .processing { color: #4ecdc4; }
     .in-tune { color: #51cf66; }
@@ -399,6 +440,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="brick-wall"></div>
   <div class="tuner-container">
@@ -411,6 +453,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Input quality / confidence panel -->
+    <div class="quality-panel" id="qualityPanel" aria-hidden="false">
+      <div class="level-bar" aria-label="Input level">
+        <div class="level-fill" id="levelFill"></div>
+      </div>
+      <div class="confidence-badge" id="confidenceBadge">-- %</div>
+    </div>
+
+    <!-- Detected note chip -->
+    <div id="detected-chip" aria-live="polite" aria-atomic="true"></div>
 
     <div class="sound-meter">
       <!-- one meter per string: e-low, a, d, g, b, e-high -->
@@ -523,7 +576,7 @@
     }, { once: true });
 
     // ───── Configuration ─────────────────────────────────────────
-    const API_BASE_URL = 'http://127.0.0.1:8000';
+    const API_BASE_URL = 'http://127.0.0.1:8001';
     const RECORDING_DURATION = 2000; // 2 seconds
     const AUTO_TUNE_INTERVAL = 3000;  // 3 seconds for auto mode
 
@@ -718,12 +771,90 @@
       }
     }
 
+    // ───── Client-side WAV Conversion (ensures backend compatibility) ─────
+    async function convertToWavBlob(inputBlob) {
+      try {
+        const ctx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuffer = await inputBlob.arrayBuffer();
+        const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+        // Mix to mono if needed
+        let monoData;
+        if (audioBuffer.numberOfChannels > 1) {
+          const ch0 = audioBuffer.getChannelData(0);
+          const ch1 = audioBuffer.getChannelData(1);
+          const len = Math.min(ch0.length, ch1.length);
+          monoData = new Float32Array(len);
+          for (let i = 0; i < len; i++) monoData[i] = (ch0[i] + ch1[i]) / 2;
+        } else {
+          monoData = audioBuffer.getChannelData(0);
+        }
+
+        // Resample to 44100 Hz if necessary using OfflineAudioContext
+        let renderBuffer;
+        if (audioBuffer.sampleRate !== 44100) {
+          const offline = new OfflineAudioContext(1, Math.ceil(audioBuffer.duration * 44100), 44100);
+          const src = new AudioBufferSourceNode(offline, { buffer: audioBuffer });
+          src.connect(offline.destination);
+          src.start();
+          renderBuffer = await offline.startRendering();
+        } else {
+          // Create a mono AudioBuffer from monoData
+          const buf = new AudioBuffer({ length: monoData.length, numberOfChannels: 1, sampleRate: audioBuffer.sampleRate });
+          buf.copyToChannel(monoData, 0);
+          renderBuffer = buf;
+        }
+
+        const wavBuffer = encodeWAV(renderBuffer.getChannelData(0), renderBuffer.sampleRate);
+        return new Blob([wavBuffer], { type: 'audio/wav' });
+      } catch (e) {
+        console.warn('WAV conversion failed, sending original blob:', e);
+        return inputBlob;
+      }
+    }
+
+    function encodeWAV(samples, sampleRate) {
+      // Convert Float32 [-1,1] to 16-bit PCM
+      const buffer = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buffer);
+
+      function writeString(offset, string) {
+        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+      }
+      function floatTo16BitPCM(output, offset, input) {
+        for (let i = 0; i < input.length; i++, offset += 2) {
+          let s = Math.max(-1, Math.min(1, input[i]));
+          s = s < 0 ? s * 0x8000 : s * 0x7FFF;
+          output.setInt16(offset, s, true);
+        }
+      }
+
+      // RIFF header
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+      view.setUint16(20, 1, true);  // AudioFormat (1 = PCM)
+      view.setUint16(22, 1, true);  // NumChannels
+      view.setUint32(24, sampleRate, true); // SampleRate
+      view.setUint32(28, sampleRate * 2, true); // ByteRate (SampleRate * NumChannels * BytesPerSample)
+      view.setUint16(32, 2, true);  // BlockAlign (NumChannels * BytesPerSample)
+      view.setUint16(34, 16, true); // BitsPerSample
+      writeString(36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+
+      floatTo16BitPCM(view, 44, samples);
+      return view;
+    }
+
     // ───── Backend Communication ─────────────────────────────────
     async function sendAudioForTuning(audioBlob, targetNote = null) {
       try {
         console.log('📤 Sending audio to backend for analysis...');
+        const uploadBlob = await convertToWavBlob(audioBlob);
         const formData = new FormData();
-        formData.append('file', audioBlob, 'guitar_recording.webm');
+        formData.append('file', uploadBlob, uploadBlob.type.includes('wav') ? 'audio.wav' : 'guitar_recording.webm');
         
         if (targetNote) {
           formData.append('note', targetNote);
@@ -823,8 +954,9 @@
         // Send to backend for analysis
         const tuningData = await sendAudioForTuning(audioBlob, targetNote);
         
-        // Show detected note animation
+        // Show detected note visuals
         showDetectedNote(tuningData.note);
+        showDetectedChip(tuningData.note, tuningData.cents || 0, !!tuningData.in_tune);
         
         // Update UI with results
         updateTunerUI(tuningData);
@@ -911,6 +1043,22 @@
       } else {
         console.log('❌ Could not find elements for string:', stringKey);
       }
+    }
+
+    function showDetectedChip(note, cents, inTune) {
+      const chip = document.getElementById('detected-chip');
+      if (!chip) return;
+      const sign = cents > 0 ? '+' : '';
+      chip.textContent = `✔ Detected: ${note} (${sign}${Math.abs(cents).toFixed(1)}¢)`;
+      chip.classList.remove('in-tune', 'out', 'show');
+      chip.classList.add(inTune ? 'in-tune' : 'out');
+      requestAnimationFrame(() => {
+        chip.classList.add('show');
+      });
+      clearTimeout(chip._hideTimer);
+      chip._hideTimer = setTimeout(() => {
+        chip.classList.remove('show');
+      }, 1600);
     }
 
     // ───── Manual Tune Function ─────────────────────────────────

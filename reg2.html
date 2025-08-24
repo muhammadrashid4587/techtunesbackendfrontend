@@ -182,6 +182,17 @@
 
     .character-section {
       margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    /* Pickbot wrapper to position arms */
+    .pickbot-character {
+      position: relative;
+      display: inline-block;
+      flex-shrink: 0;
     }
 
     .pickbot-image {
@@ -190,12 +201,43 @@
       transition: transform 0.5s ease;
       filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
       animation: scaleIn 0.8s ease 0.4s both;
-      margin-bottom: 2rem;
+      margin-bottom: 0;
     }
 
-    .pickbot-image:hover {
-      transform: scale(1.1);
-      animation: wiggle 2s ease-in-out;
+    .pickbot-image:hover { transform: scale(1.1); }
+
+    /* Arms overlay */
+    .pickbot-arm {
+      position: absolute;
+      width: 10px;               /* tune as needed for your PNG scale */
+      height: 150px;              /* tune as needed */
+      background-size: contain;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+    }
+    .pickbot-arm.left {
+      top: 55%;
+      left: 10px;               /* stick out to the left */
+      transform-origin: 70% 15%;  /* shoulder pivot guess; tweak for your asset */
+      background-image: url("Base Hands@4x - Left.png");
+      animation: waveLeft 2.2s ease-in-out infinite;
+    }
+    .pickbot-arm.right {
+      top: 30%;
+      right: 75px;              /* stick out to the right */
+      transform-origin: 30% 15%;  /* shoulder pivot guess */
+      background-image: url("Base Hands@4x - Right.png");
+      animation: waveRight 2s ease-in-out infinite;
+    }
+
+    @keyframes waveRight {
+      0%, 100% { transform: rotate(10deg); }
+      50% { transform: rotate(-8deg); }
+    }
+    @keyframes waveLeft {
+      0%, 100% { transform: rotate(-6deg); }
+      50% { transform: rotate(8deg); }
     }
 
     .dialogue-bubble {
@@ -207,7 +249,7 @@
       font-size: 1.6rem;
       font-weight: 600;
       position: relative;
-      margin: 0 auto 3rem;
+      margin: 0;
       max-width: 600px;
       box-shadow: 0 8px 25px var(--shadow-light);
       animation: slideInUp 0.8s ease 0.6s both;
@@ -362,37 +404,16 @@
         font-size: 1.1rem;
         padding: 1.2rem 1.5rem;
       }
-      /* ─── pickbot wrapper ─── */
-.pickbot-character {
-  position: relative;
-  display: inline-block; /* so the arms position to the img */
-}
 
-.pickbot-character img.pickbot-image {
-  display: block;
-}
-
-/* ─── arms styling ─── */
-.pickbot-arm {
-  position: absolute;
-  width: 60px;      /* tweak to match your hand-png size */
-  height: 80px;     /* tweak as needed */
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-.pickbot-arm.left {
-  top: 50%;                    /* vertically centered */
-  left: -30px;                 /* stick out to the left */
-  transform: translateY(-50%);
-  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
-}
-.pickbot-arm.right {
-  top: 50%;
-  right: -30px;                /* stick out to the right */
-  transform: translateY(-50%) scaleX(-1); /* flip horizontally */
-  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
-}
-
+      .character-section {
+        flex-direction: column;
+        text-align: center;
+      }
+      .dialogue-bubble {
+        margin-bottom: 1rem;
+        max-width: 100%;
+      }
+      .pickbot-image { max-width: 180px; }
     }
   </style>
 </head>
@@ -409,9 +430,11 @@
   <main class="main-container">
     <div class="registration-card">
       <div class="character-section">
-        <img src="images/PickbotTrans.png" alt="PickBot" class="pickbot-image"/>
         <div class="dialogue-bubble">
           I'm always here to jam with you! Let's get rocking and make some beautiful music together!
+        </div>
+        <div class="pickbot-character">
+          <img src="images/PickbotTrans.png" alt="PickBot" class="pickbot-image"/>
         </div>
       </div>
 

@@ -42,11 +42,11 @@
       z-index: 2;
     }
     .stand {
-      position: absolute; bottom: -20px; left: 55%;
+      position: absolute; bottom: -20px; left: 57%; 
       transform: translateX(-50%);
-      width: 200px; height: 400px;
+      width: 200px; height: 325px;
       background: url('images/Background/Stand@4x.png') center/contain no-repeat;
-      z-index: 3;
+      z-index: 2;
     }
     .floor {
       position: fixed; bottom: 0; left: 0;
@@ -55,9 +55,37 @@
 
     /* ---- AVATAR LAYERS ---- */
     #avatar-base {
-      position: absolute; bottom: 200px;
-      left: 50%; transform: translateX(-50%);
-      width: 200px; z-index: 4; display: block;
+      position: absolute; 
+      bottom: 200px;
+      left: 50%; 
+      transform: translateX(-50%);
+      width: 220px; 
+      height: 300px;
+      z-index: 3; /* lowered so the new base image can sit above it */
+      background-color: #ffffff;
+
+      /* Mask to fill only Pickbot shape */
+      -webkit-mask-image: url("images/newpickbotttt.png");
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+
+      mask-image: url("images/newpickbotttt.png");
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+    }
+
+    /* NEW: Base PickBot that has hands & legs (no face) */
+    #layer-basepickbot {
+      position: absolute;
+      bottom: 200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px; 
+      height: auto;
+      z-index: 4;            /* above the color-fill base, below eyes/mouth/accessories */
+      pointer-events: none;  /* don't block clicks */
     }
 
     #layer-hands {
@@ -87,67 +115,7 @@
       align-items: center; padding-top: 30px;
     }
 
-    /* hide empty layers */
-    .avatar-layer, .avatar-base {
-      display: none;
-    }
-    /* show only when src is set */
-    .avatar-layer[src]:not([src=""]),
-    .avatar-base[src]:not([src=""]) {
-      display: block;
-    }
-
-    .color-options {
-      display: grid;
-      grid-template-columns: repeat(4, 60px);
-      grid-auto-rows: 60px;
-      column-gap: 10px; row-gap: 10px;
-      width: calc(60px*4 + 10px*3 + 30px);
-      background: white; padding: 15px; border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    
-    .preset-colors {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    
-    .preset-color-btn {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #333;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .preset-color-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-    
-    .preset-color-btn.active {
-      border-color: #fff;
-      box-shadow: 0 0 15px rgba(255,255,255,0.8);
-    }
-    .color-options > * {
-      width: 60px!important; height: 60px!important;
-      object-fit: contain; cursor: pointer;
-      border-radius: 8px; transition: transform .2s;
-    }
-    .color-options > *:hover { transform: scale(1.05); }
-    .color-options input[type="color"] {
-      -webkit-appearance: none; border: none; padding: 0;
-      width: 60px; height: 60px; border-radius: 50%;
-      background: none; cursor: pointer;
-    }
-    .color-options input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-options input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
-
-    .toolbar { display: flex; gap: 20px; }
+    .toolbar { display: flex; gap: 20px; margin-top: 20px; }
     .toolbar img { width: 60px; height: auto; cursor: pointer; }
 
     #resetBtn, #saveAvatarBtn {
@@ -158,9 +126,22 @@
       transition: background 0.2s;
     }
     #resetBtn:hover, #saveAvatarBtn:hover { background: #3aa8e0; }
-  </style>
 
-  <!-- html2canvas WITHOUT integrity/CORS so it actually loads -->
+    /* Options container */
+    #optionBox {
+      display: flex; flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 15px 0;
+    }
+    #optionBox img {
+      width: 60px; height: 60px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.2s;
+    }
+    #optionBox img:hover { transform: scale(1.1); }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
@@ -173,29 +154,38 @@
         <div class="lamp"></div>
         <div class="stand"></div>
 
-        <!-- pickbot body base + layers -->
-        <img id="avatar-base" src="images/newpickbotttt.png" alt="Avatar base">
-        <img id="layer-hands"       class="avatar-layer" src="" alt="Hands layer">
-        <img id="layer-eyes"        class="avatar-layer" src="" alt="Eyes layer">
-        <img id="layer-mouth"       class="avatar-layer" src="" alt="Mouth layer">
-        <img id="layer-accessories" class="avatar-layer" src="" alt="Accessory layer">
+        <!-- Base & Layers -->
+        <div id="avatar-base"></div>
+
+        <!-- NEW: base PickBot with hands & legs beneath current layers -->
+        <img
+          id="layer-basepickbot"
+          src="Pickbot- Translucent Ideas/PickBot no eyes no mouth.png"
+          alt="PickBot Base (hands & legs)"
+        />
+
+        <img id="layer-hands"       class="avatar-layer" src="" alt="">
+        <img id="layer-eyes"        class="avatar-layer" src="" alt="">
+        <img id="layer-mouth"       class="avatar-layer" src="" alt="">
+        <img id="layer-accessories" class="avatar-layer" src="" alt="">
       </div>
     </div>
 
     <div class="right-panel">
-      <div class="color-options" id="optionBox"></div>
-      <button id="customColorBtn" style="display: none; margin: 10px auto; padding: 8px 16px; background-color: #4DB8FF; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Custom Color</button>
+      <!-- Spin Wheel -->
+      <div style="text-align:center; margin:20px;">
+        <canvas id="colorWheel" width="300" height="300"></canvas>
+        <button id="spinBtn" style="margin-top:15px; padding:10px 20px;">Spin</button>
+      </div>
+
+      <!-- Options for accessories -->
+      <div id="optionBox"></div>
+
       <div class="toolbar">
-        <img src="images/Background/Hands Button@4x.png"
-             onclick="setOption('hands')" alt="Hands">
-        <img src="images/Background/Eyes Button@4x.png"
-             onclick="setOption('eyes')" alt="Eyes">
-        <img src="images/Background/Mouth Button@4x.png"
-             onclick="setOption('mouth')" alt="Mouth">
-        <img src="images/Background/Accessory Button@4x.png"
-             onclick="setOption('accessories')" alt="Accessories">
-        <img src="images/Background/Body Button@4x.png"
-             onclick="setOption('body')" alt="Color">
+        <img src="images/Background/Hands Button@4x.png" onclick="setOption('hands')" alt="Hands">
+        <img src="images/Background/Eyes Button@4x.png" onclick="setOption('eyes')" alt="Eyes">
+        <img src="images/Background/Mouth Button@4x.png" onclick="setOption('mouth')" alt="Mouth">
+        <img src="images/Background/Accessory Button@4x.png" onclick="setOption('accessories')" alt="Accessories">
       </div>
       <button id="resetBtn" onclick="resetAvatar()">Reset</button>
       <button id="saveAvatarBtn">Save &amp; Return</button>
@@ -203,12 +193,8 @@
   </div>
 
   <script>
-    const folderMap = {
-      hands: 'Hands',
-      eyes: 'Eyes',
-      mouth: 'Mouth',
-      accessories: 'Accessories'
-    };
+    // Categories & Files
+    const folderMap = { hands: 'Hands', eyes: 'Eyes', mouth: 'Mouth', accessories: 'Accessories' };
     const files = {
       hands: ['Base Hands@4x.png','Bent Hands@4x.png','Down Hands@4x.png','Raise and Bent Hands@4x.png','Up Hands@4x.png'],
       eyes:  ['Base Eyes@4x.png','Eyelash Eyes@4x.png','Eyeliner Eyes@4x.png','Half Eyes@4x.png'],
@@ -216,46 +202,10 @@
       accessories: ['Beanie@4x.png','Bow@4x.png','Cowboy Hat@4x.png','Crown@4x.png','Hat@4x.png','Party Hat@4x.png','Purse@4x.png','binoculars@4x.png','braids@4x.png','glasses@4x.png','necklace@4x.png','swoop hair@4x.png','tie@4x.png']
     };
 
+    // Show options
     function setOption(category) {
       const box = document.getElementById('optionBox');
       box.innerHTML = '';
-      
-      // Hide custom color button for non-body categories
-      if (category !== 'body') {
-        document.getElementById('customColorBtn').style.display = 'none';
-      }
-      
-      if (category === 'body') {
-        // Add preset color buttons inside the white box
-        const presetColors = [
-          { color: '#ff0000', name: 'Red' },
-          { color: '#00ff00', name: 'Green' },
-          { color: '#0000ff', name: 'Blue' },
-          { color: '#ffff00', name: 'Yellow' },
-          { color: '#ff00ff', name: 'Magenta' },
-          { color: '#00ffff', name: 'Cyan' },
-          { color: '#ff8000', name: 'Orange' },
-          { color: '#8000ff', name: 'Purple' },
-          { color: '#ffffff', name: 'White' }
-        ];
-        
-        presetColors.forEach(preset => {
-          const btn = document.createElement('div');
-          btn.className = 'preset-color-btn';
-          btn.style.backgroundColor = preset.color;
-          if (preset.color === '#ffffff') {
-            btn.style.border = '3px solid #ccc';
-          }
-          btn.title = preset.name;
-          btn.onclick = () => setPresetColor(preset.color);
-          box.appendChild(btn);
-        });
-        
-        // Show custom color button
-        document.getElementById('customColorBtn').style.display = 'block';
-        
-        return;
-      }
       files[category].forEach(file => {
         const img = document.createElement('img');
         img.src = `images/Choice Elements/${folderMap[category]}/${file}`;
@@ -263,186 +213,73 @@
         img.onclick = () => {
           const layer = document.getElementById(`layer-${category}`);
           layer.src = img.src;
-          console.log(`Set ${category} layer to:`, img.src);
         };
         box.appendChild(img);
       });
     }
 
+    // Reset avatar
     function resetAvatar() {
-      document.getElementById('avatar-base').style.filter = 'none';
+      document.getElementById('avatar-base').style.backgroundColor = '#ffffff';
       ['hands','eyes','mouth','accessories'].forEach(cat => {
         document.getElementById(`layer-${cat}`).src = '';
       });
-      setOption('body');
     }
 
-    function hexToHue(hex) {
-      hex = hex.replace('#','');
-      const r = parseInt(hex.substr(0,2),16)/255;
-      const g = parseInt(hex.substr(2,2),16)/255;
-      const b = parseInt(hex.substr(4,2),16)/255;
-      const mx = Math.max(r,g,b), mn = Math.min(r,g,b);
-      let h = 0;
-      if (mx !== mn) {
-        if (mx === r)      h = ((g - b)/(mx - mn))*60;
-        else if (mx === g) h = ((b - r)/(mx - mn))*60 + 120;
-        else               h = ((r - g)/(mx - mn))*60 + 240;
-      }
-      return (h + 360) % 360;
-    }
-    
-    function setPresetColor(color) {
-      const avatarBase = document.getElementById('avatar-base');
-      
-      // Remove active class from all preset buttons
-      document.querySelectorAll('.preset-color-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      
-      // Add active class to clicked button
-      event.target.classList.add('active');
-      
-      if (color === '#ffffff') {
-        // Reset to original white
-        avatarBase.style.filter = 'none';
-        avatarBase.style.backgroundColor = 'transparent';
-        avatarBase.style.mixBlendMode = 'normal';
-        avatarBase.style.opacity = '1';
-      } else {
-        // Apply color using the same logic as the color picker
-        const hue = hexToHue(color);
-        avatarBase.style.filter = `sepia(1) hue-rotate(${hue}deg) saturate(2) brightness(1.2)`;
-        avatarBase.style.backgroundColor = 'transparent';
-        avatarBase.style.mixBlendMode = 'normal';
-        avatarBase.style.opacity = '1';
-      }
-      console.log('Set preset color to:', color);
-    }
-    
-    function openCustomColorPicker() {
-      const customBtn = document.getElementById('customColorBtn');
-      const rect = customBtn.getBoundingClientRect();
-      
-      // Create a visible color picker container
-      const pickerContainer = document.createElement('div');
-      pickerContainer.style.position = 'absolute';
-      pickerContainer.style.left = rect.left + 'px';
-      pickerContainer.style.top = (rect.bottom + 10) + 'px';
-      pickerContainer.style.backgroundColor = 'white';
-      pickerContainer.style.padding = '15px';
-      pickerContainer.style.borderRadius = '8px';
-      pickerContainer.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-      pickerContainer.style.zIndex = '1000';
-      pickerContainer.style.border = '2px solid #4DB8FF';
-      
-      // Create the color picker input
-      const picker = document.createElement('input');
-      picker.type = 'color';
-      picker.value = '#ff0000';
-      picker.style.width = '200px';
-      picker.style.height = '200px';
-      picker.style.border = 'none';
-      picker.style.borderRadius = '6px';
-      picker.style.cursor = 'pointer';
-      
-      // Add close button
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = '✓ Apply';
-      closeBtn.style.marginTop = '10px';
-      closeBtn.style.padding = '8px 16px';
-      closeBtn.style.backgroundColor = '#4DB8FF';
-      closeBtn.style.color = 'white';
-      closeBtn.style.border = 'none';
-      closeBtn.style.borderRadius = '6px';
-      closeBtn.style.cursor = 'pointer';
-      closeBtn.style.fontSize = '14px';
-      closeBtn.style.fontWeight = 'bold';
-      
-      picker.oninput = e => {
-        const color = e.target.value;
-        const avatarBase = document.getElementById('avatar-base');
-        
-        if (color === '#ffffff' || color === '#f7f7f7' || color === '#f8f8f8' || color === '#f9f9f9' || color === '#fafafa' || color === '#fbfbfb' || color === '#fcfcfc' || color === '#fdfdfd' || color === '#fefefe') {
-          avatarBase.style.filter = 'none';
-          avatarBase.style.backgroundColor = 'transparent';
-          avatarBase.style.mixBlendMode = 'normal';
-          avatarBase.style.opacity = '1';
-        } else {
-          const hue = hexToHue(color);
-          avatarBase.style.filter = `sepia(1) hue-rotate(${hue}deg) saturate(2) brightness(1.2)`;
-          avatarBase.style.backgroundColor = 'transparent';
-          avatarBase.style.mixBlendMode = 'normal';
-          avatarBase.style.opacity = '1';
-        }
-        console.log('Changed ogbot color to:', color);
-      };
-      
-      closeBtn.onclick = () => {
-        document.body.removeChild(pickerContainer);
-      };
-      
-      pickerContainer.appendChild(picker);
-      pickerContainer.appendChild(closeBtn);
-      document.body.appendChild(pickerContainer);
-      
-      // Apply initial color
-      picker.oninput({ target: { value: picker.value } });
-    }
-
-    window.onload = () => {
-      setOption('body');
-      
-      // Add click handler for custom color button
-      document.getElementById('customColorBtn').onclick = openCustomColorPicker;
-      
-      // Load previously saved avatar if it exists
-      const savedProfile = localStorage.getItem('technoProfile');
-      if (savedProfile) {
-        try {
-          const profile = JSON.parse(savedProfile);
-          if (profile.avatar) {
-            console.log('Loading saved avatar configuration:', profile.avatar);
-            Object.entries(profile.avatar).forEach(([category, file]) => {
-              if (file && file !== '') {
-                const layer = document.getElementById(`layer-${category}`);
-                if (layer) {
-                  layer.src = `images/Choice Elements/${folderMap[category]}/${file}`;
-                  console.log(`Loaded ${category} layer:`, file);
-                }
-              }
-            });
-          }
-        } catch (e) {
-          console.error('Error loading saved avatar:', e);
-        }
-      }
-    };
-
-    // Save & Return → snapshot the mirror and store in localStorage
+    // Save avatar
     document.getElementById('saveAvatarBtn').addEventListener('click', () => {
       const mirror = document.querySelector('.mirror');
-      
-      // Ensure all visible layers are properly rendered
-      const visibleLayers = mirror.querySelectorAll('img[src]:not([src=""])');
-      console.log('Visible layers:', visibleLayers.length);
-      
-      html2canvas(mirror, { 
-        backgroundColor: null,
-        useCORS: true,
-        allowTaint: true,
-        scale: 2 // Higher quality
-      })
+      html2canvas(mirror, { backgroundColor: null, useCORS: true, allowTaint: true, scale: 2 })
         .then(canvas => {
           const dataUrl = canvas.toDataURL('image/png');
           localStorage.setItem('savedAvatar', dataUrl);
-          console.log('Avatar saved successfully');
-          location.href = 'profile.html';
-        })
-        .catch(err => {
-          console.error('Error saving avatar:', err);
-          alert('Sorry, could not save your avatar. Please try again.');
+          location.href = 'homepage.html';
         });
+    });
+
+    // Spin Color Wheel
+    const colors = ["#ff0000","#00ff00","#0000ff","#ffff00","#ff00ff","#00ffff","#ff8000","#8000ff","#ffffff"];
+    const canvas = document.getElementById("colorWheel");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    let startAngle = 0;
+    const arc = (2 * Math.PI) / colors.length;
+
+    function drawWheel() {
+      for (let i = 0; i < colors.length; i++) {
+        ctx.beginPath();
+        ctx.fillStyle = colors[i];
+        ctx.moveTo(150, 150);
+        ctx.arc(150, 150, 150, startAngle + i * arc, startAngle + (i + 1) * arc);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+    drawWheel();
+
+    let spinAngle = 0, spinVelocity = 0, spinning = false;
+    function spin() {
+      if (spinning) {
+        spinAngle += spinVelocity;
+        spinVelocity *= 0.98;
+        if (spinVelocity < 0.01) spinning = false;
+        startAngle += spinAngle * Math.PI / 180;
+        ctx.clearRect(0, 0, 300, 300);
+        drawWheel();
+        requestAnimationFrame(spin);
+      } else {
+        const selectedIndex = Math.floor(((2 * Math.PI - startAngle % (2 * Math.PI)) % (2 * Math.PI)) / arc);
+        const selectedColor = colors[selectedIndex];
+        document.getElementById("avatar-base").style.backgroundColor = selectedColor;
+      }
+    }
+
+    spinBtn.addEventListener("click", () => {
+      if (!spinning) {
+        spinVelocity = Math.random() * 20 + 10;
+        spinning = true;
+        spin();
+      }
     });
   </script>
 </body>
