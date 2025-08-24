@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechTunes - Loading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-purple: #d49efb;
+      --accent-yellow: #fceabb;
+      --dark-purple: #4c1a80;
+      --teal: #003d4d;
+      --dark-bg: #0a0f0f;
+      --white: #ffffff;
+      --light-gray: #cccccc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--dark-bg), var(--dark-purple), var(--teal));
+      background-size: 400% 400%;
+      animation: gradientShift 8s ease infinite;
+      color: var(--white);
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url('images/Brick_Wall.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.2;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      25% { background-position: 100% 50%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+    }
+
+    .transition-container {
+      position: relative;
+      z-index: 10;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .logo-animation {
+      margin-bottom: 3rem;
+    }
+
+    .letter {
+      display: inline-block;
+      font-size: clamp(3rem, 8vw, 8rem);
+      font-weight: 900;
+      opacity: 0;
+      transform: translateY(100px) rotateX(90deg);
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow), #ff6b9d, #7e5bef);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: letterAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+                 shimmer 3s ease-in-out infinite;
+      position: relative;
+      margin: 0 0.1em;
+      text-shadow: 0 0 30px rgba(212, 158, 251, 0.5);
+    }
+
+    @keyframes letterAppear {
+      0% {
+        opacity: 0;
+        transform: translateY(100px) rotateX(90deg) scale(0.3);
+      }
+      50% {
+        opacity: 0.8;
+        transform: translateY(-20px) rotateX(0deg) scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg) scale(1);
+      }
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .letter:nth-child(1) { animation-delay: 0.1s; }
+    .letter:nth-child(2) { animation-delay: 0.2s; }
+    .letter:nth-child(3) { animation-delay: 0.3s; }
+    .letter:nth-child(4) { animation-delay: 0.4s; }
+    .letter:nth-child(5) { animation-delay: 0.5s; }
+    .letter:nth-child(6) { animation-delay: 0.6s; }
+    .letter:nth-child(7) { animation-delay: 0.7s; }
+    .letter:nth-child(8) { animation-delay: 0.8s; }
+    .letter:nth-child(9) { animation-delay: 0.9s; }
+
+    .musical-note {
+      position: absolute;
+      font-size: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+      color: var(--accent-yellow);
+      text-shadow: 0 0 10px rgba(252, 234, 187, 0.8);
+    }
+
+    @keyframes noteFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg) scale(0.5);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(-20px) rotate(180deg) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) rotate(360deg) scale(0.3);
+      }
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, var(--accent-yellow), transparent);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    @keyframes sparkleFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0);
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(0);
+      }
+    }
+
+    .tagline {
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease forwards;
+      animation-delay: 1.5s;
+      color: var(--light-gray);
+      margin-top: 2rem;
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .loading-bar-container {
+      width: 300px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin-top: 3rem;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+      animation-delay: 2s;
+    }
+
+    .loading-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-purple), var(--accent-yellow), var(--primary-purple));
+      background-size: 200% 100%;
+      border-radius: 10px;
+      width: 0%;
+      animation: loadProgress 3s ease-in-out forwards,
+                 barShimmer 2s ease-in-out infinite;
+      animation-delay: 2.2s, 2.2s;
+    }
+
+    @keyframes loadProgress {
+      to { width: 100%; }
+    }
+
+    @keyframes barShimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .music-visualization {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+      animation-delay: 2.5s;
+    }
+
+    .music-bar {
+      width: 4px;
+      background: linear-gradient(to top, var(--primary-purple), var(--accent-yellow));
+      border-radius: 2px;
+      animation: musicPulse 1.5s ease-in-out infinite;
+    }
+
+    .music-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+    .music-bar:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+    .music-bar:nth-child(3) { height: 25px; animation-delay: 0.2s; }
+    .music-bar:nth-child(4) { height: 40px; animation-delay: 0.3s; }
+    .music-bar:nth-child(5) { height: 30px; animation-delay: 0.4s; }
+    .music-bar:nth-child(6) { height: 45px; animation-delay: 0.5s; }
+    .music-bar:nth-child(7) { height: 25px; animation-delay: 0.6s; }
+    .music-bar:nth-child(8) { height: 35px; animation-delay: 0.7s; }
+
+    @keyframes musicPulse {
+      0%, 100% { transform: scaleY(0.3); opacity: 0.7; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .fade-out {
+      animation: fadeOut 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(1.1);
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .letter {
+        font-size: clamp(2rem, 6vw, 6rem);
+        margin: 0 0.05em;
+      }
+      
+      .loading-bar-container {
+        width: 250px;
+      }
+      
+      .tagline {
+        font-size: clamp(1rem, 2.5vw, 1.5rem);
+        padding: 0 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="transition-container">
+    <div class="logo-animation">
+      <span class="letter">T</span>
+      <span class="letter">e</span>
+      <span class="letter">c</span>
+      <span class="letter">h</span>
+      <span class="letter">T</span>
+      <span class="letter">u</span>
+      <span class="letter">n</span>
+      <span class="letter">e</span>
+      <span class="letter">s</span>
+    </div>
+    
+    <div class="tagline">Where Music Meets Technology</div>
+    
+    <div class="loading-bar-container">
+      <div class="loading-bar"></div>
+    </div>
+    
+    <div class="music-visualization">
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    // Musical notes and sparkles animation
+    const letters = document.querySelectorAll('.letter');
+    const musicNotes = ['♪', '♫', '♬', '♩', '♭', '♯', '𝄞'];
+    
+    letters.forEach((letter, index) => {
+      // Add musical notes
+      setTimeout(() => {
+        createMusicalNote(letter, index);
+        createSparkles(letter, index);
+      }, (index + 1) * 200);
+    });
+
+    function createMusicalNote(letter, index) {
+      const note = document.createElement('div');
+      note.className = 'musical-note';
+      note.textContent = musicNotes[index % musicNotes.length];
+      
+      const rect = letter.getBoundingClientRect();
+      note.style.left = (rect.left + rect.width / 2) + 'px';
+      note.style.top = (rect.top + rect.height / 2) + 'px';
+      
+      document.body.appendChild(note);
+      
+      note.style.animation = 'noteFloat 2s ease-out forwards';
+      
+      setTimeout(() => {
+        note.remove();
+      }, 2000);
+    }
+
+    function createSparkles(letter, index) {
+      const rect = letter.getBoundingClientRect();
+      
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => {
+          const sparkle = document.createElement('div');
+          sparkle.className = 'sparkle';
+          
+          const offsetX = (Math.random() - 0.5) * rect.width;
+          const offsetY = (Math.random() - 0.5) * rect.height;
+          
+          sparkle.style.left = (rect.left + rect.width / 2 + offsetX) + 'px';
+          sparkle.style.top = (rect.top + rect.height / 2 + offsetY) + 'px';
+          
+          document.body.appendChild(sparkle);
+          
+          sparkle.style.animation = `sparkleFloat ${1 + Math.random()}s ease-out forwards`;
+          
+          setTimeout(() => {
+            sparkle.remove();
+          }, 2000);
+        }, i * 100);
+      }
+    }
+
+    // Auto-redirect after animation completes
+    setTimeout(() => {
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        // Get the target page from URL parameter or default to home
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetPage = urlParams.get('target') || 'home.html';
+        window.location.href = targetPage;
+      }, 1000);
+    }, 5500);
+
+    // Add continuous sparkle effects
+    setInterval(() => {
+      const container = document.querySelector('.transition-container');
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      
+      sparkle.style.left = Math.random() * window.innerWidth + 'px';
+      sparkle.style.top = Math.random() * window.innerHeight + 'px';
+      sparkle.style.animation = `sparkleFloat ${2 + Math.random() * 2}s ease-out forwards`;
+      
+      document.body.appendChild(sparkle);
+      
+      setTimeout(() => {
+        sparkle.remove();
+      }, 4000);
+    }, 300);
+  </script>
+</body>
+</html>

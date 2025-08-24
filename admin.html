@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechTunes Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-purple: #d49efb;
+      --accent-yellow: #fceabb;
+      --dark-purple: #4c1a80;
+      --teal: #003d4d;
+      --dark-bg: #0a0f0f;
+      --white: #ffffff;
+      --light-gray: #cccccc;
+      --border-radius: 20px;
+      --border-width: 2.5px;
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      --shadow-light: rgba(0, 0, 0, 0.2);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--dark-bg), var(--dark-purple), var(--teal));
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      position: relative;
+      padding: 7rem 2rem 2rem;
+    }
+    body::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image: url('images/Brick_Wall.png');
+      background-size: cover; background-position: center;
+      opacity: 0.3; z-index: 0;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      25% { background-position: 100% 50%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+    }
+
+    .container { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; }
+    .title {
+      text-align: center; margin: 0 0 20px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
+      font-size: clamp(24px, 4vw, 36px);
+      background: linear-gradient(90deg, #ffffff, var(--primary-purple), #7e5bef);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 0 20px rgba(239, 9, 208, 0.35);
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px; padding: 20px; box-shadow: 0 20px 60px var(--shadow-dark);
+    }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    input, button { font-family: inherit; font-size: 1rem; }
+    input { padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: var(--white); outline: none; }
+    input:focus { border-color: var(--primary-purple); box-shadow: 0 0 0 3px rgba(212, 158, 251, 0.25); }
+
+    button {
+      display: inline-block; padding: 12px 16px; border-radius: 14px;
+      border: var(--border-width) solid rgba(255,255,255,0.9);
+      background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+      color: var(--white); font-weight: 800; cursor: pointer;
+      box-shadow: 0 8px 25px var(--shadow-light);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    button:hover { transform: translateY(-2px); filter: brightness(1.05); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    pre { background: rgba(0,0,0,0.35); color: var(--white); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15); overflow: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="title">Admin Portal</h2>
+    <div class="card">
+    <h3>Login</h3>
+    <div class="row">
+      <input id="password" type="password" placeholder="Admin password" />
+      <button id="login">Login</button>
+      <button id="logout" disabled>Logout</button>
+    </div>
+    <div id="status" style="margin-top:8px;color:#888"></div>
+    <hr style="border-color: rgba(255,255,255,0.15)"/>
+    <div class="row">
+      <button id="ping" disabled>Check Admin Health</button>
+      <button id="loadOnboarding" disabled>Load Onboarding Submissions</button>
+    </div>
+    <pre id="output" style="margin-top:12px; min-height: 200px;"></pre>
+    </div>
+  </div>
+  <script src="js/config.js"></script>
+  <script>
+    const statusEl = document.getElementById('status');
+    const output = document.getElementById('output');
+    const loginBtn = document.getElementById('login');
+    const logoutBtn = document.getElementById('logout');
+    const pingBtn = document.getElementById('ping');
+    const loadOnboardingBtn = document.getElementById('loadOnboarding');
+    const passwordEl = document.getElementById('password');
+
+    const ADMIN_TOKEN_KEY = 'adminToken';
+
+    const apiBase = () => (window.TechTunes ? window.TechTunes.getApiBase() : 'http://localhost:8001');
+    const getToken = () => (window.TechTunes ? window.TechTunes.getToken(ADMIN_TOKEN_KEY) : null);
+    const setToken = (t) => window.TechTunes && window.TechTunes.setToken(ADMIN_TOKEN_KEY, t);
+    const clearToken = () => window.TechTunes && window.TechTunes.clearToken(ADMIN_TOKEN_KEY);
+
+    function setAuthedUI(authed){
+      pingBtn.disabled = !authed;
+      loadOnboardingBtn.disabled = !authed;
+      logoutBtn.disabled = !authed;
+    }
+
+    // Initialize from stored token
+    document.addEventListener('DOMContentLoaded', () => {
+      const tok = getToken();
+      if (tok) {
+        statusEl.textContent = 'Session restored';
+        setAuthedUI(true);
+      }
+    });
+
+    loginBtn.addEventListener('click', async () => {
+      statusEl.textContent = 'Logging in...';
+      output.textContent = '';
+      try {
+        const form = new FormData();
+        form.append('password', passwordEl.value);
+        const res = await fetch(`${apiBase()}/admin/login`, { method: 'POST', body: form });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || 'Login failed');
+        }
+        const data = await res.json();
+        setToken(data.token);
+        statusEl.textContent = 'Logged in';
+        setAuthedUI(true);
+      } catch (e) {
+        statusEl.textContent = e.message || 'Login failed';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      clearToken();
+      setAuthedUI(false);
+      statusEl.textContent = 'Logged out';
+      output.textContent = '';
+    });
+
+    pingBtn.addEventListener('click', async () => {
+      output.textContent = 'Pinging...';
+      try {
+        const res = await fetch(`${apiBase()}/admin/health`, { headers: { 'X-Admin-Token': getToken() || '' } });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        output.textContent = 'Failed: ' + (e.message || 'error');
+      }
+    });
+
+    loadOnboardingBtn.addEventListener('click', async () => {
+      output.textContent = 'Loading onboarding submissions...';
+      try {
+        const res = await fetch(`${apiBase()}/admin/onboarding`, { headers: { 'X-Admin-Token': getToken() || '' } });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        output.textContent = 'Failed: ' + (e.message || 'error');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 :root {
-  --primary-purple: #d49efb;
+  --primary-purple: #9300fc;
   --dark-purple:   #4c1a80;
   --teal:          #003d4d;
   --white:         #ffffff;
@@ -132,6 +132,7 @@ nav ul li a:hover::after {
 #profile-form button:hover {
   opacity: 0.9;
 }
+
 
 /* Fancy Customize Avatar Button */
 #edit-avatar-btn {
@@ -328,4 +329,22 @@ margin: 1rem auto;
   background-image: url("../images/Choice Elements/Hands/Base Hands@4x.png");
   */
 }
-
+#avatar-base {
+  position: absolute;
+  bottom: 200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 300px; /* Adjust to match your Pickbot */
+  z-index: 4;
+  background: url('images/newpickbotttt.png') center/contain no-repeat;
+  -webkit-mask-image: url('images/newpickbotttt.png'); /* Safari */
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: url('images/newpickbotttt.png'); /* Other browsers */
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  background-color: #fff; /* Will change dynamically with JS */
+}

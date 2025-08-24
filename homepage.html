@@ -9,13 +9,17 @@
   <link rel="stylesheet" href="css/mousetrail.css">
 
   <style>
+    html { 
+      height: 100%;
+      overflow: hidden; 
+    }
     /* ─── Body + Background Images ─── */
     body {
       margin: 0;
       padding: 0;
       height: 100vh;
       position: relative;
-      overflow-x: hidden;
+      overflow: hidden;
       background-image:
         url('images/Floor.png'),
         url('images/Brick_Wall.png'),
@@ -29,12 +33,9 @@
         center,
         top left;
       background-repeat:
-        no-repeat,
-        no-repeat,
+
         no-repeat;
       background-attachment:
-        scroll,
-        scroll,
         scroll;
       z-index: 0;
     }
@@ -144,7 +145,7 @@
       left: 50%;
       transform: translateX(-50%);
       width: 330px;
-      height: 880px;
+      height: 1000px;
       background-image: url('images/LessonIsland.png');
       transform-origin: center bottom;
     }
@@ -152,8 +153,8 @@
   position: absolute;
   top: -15%;    /* adjust as needed */
   left: 2%;   /* position next to impact */
-  width: 400px;
-  height: 400px;
+  width: 450px;
+  height: 550px;
   background-image: url("images/Background/Lamp Dressing Room@4x.png");
   background-size: contain;
   background-repeat: no-repeat;
@@ -165,7 +166,7 @@
       bottom: 20%;
       left: 5%;
       width: 800px;
-      height: 300px;
+      height: 350px;
       background-image: url('images/TuneStation.png');
       background-position: left;
     }
@@ -173,8 +174,8 @@
       position: absolute;
       bottom: 20%;
       right: 5%;
-      width: 300px;
-      height: 300px;
+      width: 440px;
+      height: 410px;
       background-image: url('images/SongSearch.png');
       background-position: right;
     }
@@ -182,16 +183,16 @@
       position: absolute;
       top: 15%;
       left: 15%;
-      width: 200px;
-      height: 200px;
+      width: 300px;
+      height: 240px;
       background-image: url('images/Impact.png');
     }
     .profile {
       position: absolute;
       top: 10%;
       right: 10%;
-      width: 200px;
-      height: 200px;
+      width: 300px;
+      height: 300px;
       background-image: url('images/Profile.png');
     }
 
@@ -215,6 +216,7 @@
       left: 0;
       width: 100%;
       height: 100%;
+      overflow: hidden;
       pointer-events: none;
       z-index: 1;
     }
@@ -250,9 +252,13 @@
   <!-- NAV BAR -->
   <nav>
     <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="login.html" id="nav-login">Login</a></li>
-      <li><a href="profile.html" id="nav-profile">Profile</a></li>
+      <li><a href="homepage.html">Home</a></li>
+      <li><a href="lesson_island.html">Lessons</a></li>
+      <li><a href="guitar_tuner.html">Tuner</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="instructor.html">Instructor</a></li>
+      <li><a href="admin.html">Admin</a></li>
       <li><a href="#" id="nav-logout" style="display:none">Logout</a></li>
     </ul>
   </nav>
@@ -264,7 +270,7 @@
 
   <!-- MAIN CONTENT -->
   <div class="logo"></div>
-  <div class="lesson-island"></div>
+  <a href="lesson_island.html" class="lesson-island" aria-label="Lesson Island"></a>
   <div class="tune-station"></div>
   <div class="song-search"></div>
 

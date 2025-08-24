@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instructor Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-purple: #d49efb;
+      --accent-yellow: #fceabb;
+      --dark-purple: #4c1a80;
+      --teal: #003d4d;
+      --dark-bg: #0a0f0f;
+      --white: #ffffff;
+      --light-gray: #cccccc;
+      --border-radius: 20px;
+      --border-width: 2.5px;
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+      --shadow-light: rgba(0, 0, 0, 0.2);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--dark-bg), var(--dark-purple), var(--teal));
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      position: relative;
+      padding: 7rem 2rem 2rem;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url('images/Brick_Wall.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      25% { background-position: 100% 50%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+    }
+
+    .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+
+    .title {
+      text-align: center;
+      margin: 0 0 20px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: clamp(24px, 4vw, 36px);
+      background: linear-gradient(90deg, #ffffff, var(--primary-purple), #7e5bef);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 0 20px rgba(239, 9, 208, 0.35);
+    }
+
+    .grid { display: grid; grid-template-columns: 340px 1fr; gap: 18px; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 20px 60px var(--shadow-dark);
+    }
+    .card h3 { margin: 0 0 10px; font-weight: 800; }
+
+    label, input, textarea, button, select { font-family: inherit; font-size: 1rem; }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--white);
+      outline: none;
+      transition: 0.2s ease;
+      margin: 6px 0 10px;
+    }
+    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.7); }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary-purple); box-shadow: 0 0 0 3px rgba(212, 158, 251, 0.25); }
+
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    button {
+      display: inline-block;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: var(--border-width) solid rgba(255,255,255,0.9);
+      background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+      color: var(--white);
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 25px var(--shadow-light);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    button:hover { transform: translateY(-2px); filter: brightness(1.05); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    ul { padding-left: 18px; margin: 8px 0; }
+    li { margin: 8px 0; }
+    small { color: var(--light-gray); }
+
+    .file-btn { display:inline-block; padding:12px 16px; border-radius:14px; border: var(--border-width) solid rgba(255,255,255,0.9); background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple)); color:#fff; font-weight:800; cursor:pointer; box-shadow: 0 8px 25px var(--shadow-light); }
+    .file-name { margin-left:8px; color: var(--light-gray); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="title">Instructor Portal</h2>
+    <div class="grid">
+    <div class="card">
+      <h3>Login</h3>
+      <input id="instrPassword" type="password" placeholder="Instructor password" />
+      <button id="instrLogin">Login</button>
+      <button id="instrLogout" disabled>Logout</button>
+      <div id="instrStatus" style="color:#888"></div>
+
+      <hr style="border-color: rgba(255,255,255,0.15)"/>
+      <h3>Create Course</h3>
+      <input id="courseName" placeholder="Course name" />
+      <textarea id="courseDesc" rows="3" placeholder="Course description"></textarea>
+      <input id="courseOwner" placeholder="Owner (email or id)" />
+      <button id="createCourse" disabled>Create</button>
+
+      <hr style="border-color: rgba(255,255,255,0.15)"/>
+      <h3>Create Lesson (Upload File)</h3>
+      <input id="lessonCourseId" type="number" placeholder="Course ID" />
+      <input id="lessonTitle" placeholder="Lesson title" />
+      <textarea id="lessonDesc" rows="3" placeholder="Lesson description"></textarea>
+      <input id="lessonFile" type="file" accept=".pdf,.mp4,.mp3,.wav,.png,.jpg,.jpeg,.gif,.zip,.doc,.docx,.ppt,.pptx" style="position:absolute; left:-9999px;" />
+      <div class="row">
+        <label for="lessonFile" id="pickFile" class="file-btn">Choose File</label>
+        <span id="fileName" class="file-name">No file chosen</span>
+      </div>
+      <button id="createLesson" disabled>Create</button>
+    </div>
+
+    <div class="card">
+      <h3>My Courses</h3>
+      <button id="refreshCourses" disabled>Refresh</button>
+      <ul id="courses"></ul>
+
+      <h3>Lessons for Course</h3>
+      <input id="listLessonsCourseId" type="number" placeholder="Course ID" />
+      <button id="refreshLessons" disabled>Refresh</button>
+      <ul id="lessons"></ul>
+    </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script>
+    const q = id => document.getElementById(id);
+    const INSTR_TOKEN_KEY = 'instructorToken';
+    const apiBase = () => (window.TechTunes ? window.TechTunes.getApiBase() : 'http://localhost:8001');
+    const getToken = () => (window.TechTunes ? window.TechTunes.getToken(INSTR_TOKEN_KEY) : null);
+    const setToken = (t) => window.TechTunes && window.TechTunes.setToken(INSTR_TOKEN_KEY, t);
+    const clearToken = () => window.TechTunes && window.TechTunes.clearToken(INSTR_TOKEN_KEY);
+
+    function setAuthedUI(authed){
+      q('createCourse').disabled = !authed;
+      q('createLesson').disabled = !authed;
+      q('refreshCourses').disabled = !authed;
+      q('refreshLessons').disabled = !authed;
+      q('instrLogout').disabled = !authed;
+    }
+
+    // Helper for JSON API
+    const api = (path, opts={}) => fetch(`${apiBase()}${path}`, {
+      ...opts,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(opts.headers || {}),
+        ...(getToken() ? { 'X-Instructor-Token': getToken() } : {}),
+      },
+    });
+
+    // Restore session
+    document.addEventListener('DOMContentLoaded', () => {
+      if (getToken()) {
+        q('instrStatus').textContent = 'Session restored';
+        setAuthedUI(true);
+      }
+    });
+
+    q('instrLogin').addEventListener('click', async () => {
+      const form = new FormData();
+      form.append('password', q('instrPassword').value);
+      const res = await fetch(`${apiBase()}/instructor/login`, { method: 'POST', body: form });
+      if (!res.ok) { 
+        const txt = await res.text();
+        q('instrStatus').textContent = txt || 'Login failed';
+        return; 
+      }
+      const data = await res.json();
+      setToken(data.token);
+      q('instrStatus').textContent = 'Logged in';
+      setAuthedUI(true);
+    });
+
+    q('instrLogout').addEventListener('click', () => {
+      clearToken();
+      setAuthedUI(false);
+      q('instrStatus').textContent = 'Logged out';
+    });
+
+    q('createCourse').addEventListener('click', async () => {
+      const body = JSON.stringify({
+        name: q('courseName').value,
+        description: q('courseDesc').value,
+        owner: q('courseOwner').value,
+      });
+      const res = await api('/instructor/courses', { method: 'POST', body });
+      if (!res.ok) {
+        const txt = await res.text();
+        alert('Failed to create course: ' + txt);
+        return;
+      }
+      alert('Course created');
+      q('refreshCourses').click();
+    });
+
+    // Update filename on selection
+    q('lessonFile').addEventListener('change', () => {
+      const fi = q('lessonFile');
+      q('fileName').textContent = fi.files && fi.files[0] ? fi.files[0].name : 'No file chosen';
+    });
+
+    q('refreshCourses').addEventListener('click', async () => {
+      const res = await api('/instructor/courses');
+      const data = await res.json();
+      q('courses').innerHTML = (data.courses || []).map(c => `<li><b>#${c.id}</b> ${c.name} <small>(${c.created_at})</small><br/><small>${c.description || ''}</small></li>`).join('');
+    });
+
+    q('createLesson').addEventListener('click', async () => {
+      const courseIdRaw = q('lessonCourseId').value.trim();
+      const courseId = parseInt(courseIdRaw, 10);
+      if (isNaN(courseId)) { alert('Course ID must be a number'); return; }
+      const fileInput = q('lessonFile');
+      if (!fileInput.files || !fileInput.files[0]) {
+        alert('Please choose a file');
+        return;
+      }
+      const res = await fetch(`${apiBase()}/instructor/lessons/upload`, {
+        method: 'POST',
+        body: (() => { const f = new FormData(); f.append('course_id', String(courseId)); f.append('title', q('lessonTitle').value); f.append('description', q('lessonDesc').value); f.append('file', fileInput.files[0]); return f; })(),
+        headers: { 'X-Instructor-Token': getToken() || '' }
+      });
+      if (!res.ok) { 
+        const txt = await res.text();
+        alert('Failed to create lesson: ' + txt);
+        return; 
+      }
+      const data = await res.json();
+      alert('Lesson created: ' + data.title);
+    });
+
+    q('refreshLessons').addEventListener('click', async () => {
+      const courseIdRaw = q('listLessonsCourseId').value.trim();
+      const courseId = parseInt(courseIdRaw, 10);
+      if (isNaN(courseId)) { alert('Course ID must be a number'); return; }
+      const res = await api(`/instructor/courses/${courseId}/lessons`);
+      const data = await res.json();
+      q('lessons').innerHTML = (data.lessons || []).map(l => `<li><b>#${l.id}</b> ${l.title} <small>(${l.created_at})</small><br/><small>${l.description || ''}</small><br/><a href="${l.content_url}" target="_blank">${l.content_url}</a></li>`).join('');
+    });
+  </script>
+</body>
+</html>

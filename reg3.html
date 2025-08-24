@@ -183,6 +183,50 @@
 
     .character-section {
       margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .dialogue-bubble {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary-purple), #e8c5ff);
+      color: #2d1b3d;
+      border: var(--border-width) solid #2d1b3d;
+      border-radius: 25px;
+      padding: 1.2rem 1.6rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+      position: relative;
+      box-shadow: 0 8px 25px var(--shadow-light);
+      line-height: 1.3;
+    }
+
+    .dialogue-bubble::after {
+      content: '';
+      position: absolute;
+      right: -15px;
+      top: 50%;
+      width: 0;
+      height: 0;
+      border: 15px solid transparent;
+      border-left: 15px solid var(--primary-purple);
+      transform: translateY(-50%);
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+    }
+
+    /* PickBot wrapper with arm overlays */
+    .pickbot-wrapper {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .pickbot-character {
+      position: relative;
+      display: inline-block;
     }
 
     .pickbot-image {
@@ -197,6 +241,45 @@
     .pickbot-image:hover {
       transform: scale(1.1);
       animation: wiggle 2s ease-in-out;
+    }
+
+    /* Arm overlays */
+    .pickbot-arm {
+      position: absolute;
+      width: 70px;
+      height: 90px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
+    }
+
+    .pickbot-arm.left {
+      top: 48%;
+      left: -28px;
+      transform-origin: 90% 20%;
+      animation: waveLeft 2.2s ease-in-out infinite;
+    }
+
+    .pickbot-arm.right {
+      top: 48%;
+      right: -28px;
+      transform: scaleX(-1);
+      transform-origin: 10% 20%;
+      animation: waveRight 2.2s ease-in-out infinite;
+    }
+
+    @keyframes waveLeft {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-15deg); }
+      50% { transform: rotate(10deg); }
+      75% { transform: rotate(-8deg); }
+    }
+
+    @keyframes waveRight {
+      0%, 100% { transform: scaleX(-1) rotate(0deg); }
+      25% { transform: scaleX(-1) rotate(15deg); }
+      50% { transform: scaleX(-1) rotate(-10deg); }
+      75% { transform: scaleX(-1) rotate(8deg); }
     }
 
     .continue-section {
@@ -298,38 +381,22 @@
       nav ul {
         display: none;
       }
-      /* ─── pickbot wrapper ─── */
-.pickbot-character {
-  position: relative;
-  display: inline-block; /* so the arms position to the img */
-}
 
-.pickbot-character img.pickbot-image {
-  display: block;
-}
+      .character-section {
+        flex-direction: column;
+        align-items: stretch;
+      }
 
-/* ─── arms styling ─── */
-.pickbot-arm {
-  position: absolute;
-  width: 60px;      /* tweak to match your hand-png size */
-  height: 80px;     /* tweak as needed */
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-.pickbot-arm.left {
-  top: 50%;                    /* vertically centered */
-  left: -30px;                 /* stick out to the left */
-  transform: translateY(-50%);
-  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
-}
-.pickbot-arm.right {
-  top: 50%;
-  right: -30px;                /* stick out to the right */
-  transform: translateY(-50%) scaleX(-1); /* flip horizontally */
-  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
-}
+      .dialogue-bubble::after {
+        right: auto;
+        left: 20px;
+        border-left: none;
+        border-right: 15px solid var(--primary-purple);
+      }
 
-
+      .pickbot-image {
+        max-width: 160px;
+      }
     }
   </style>
 </head>
@@ -346,7 +413,14 @@
   <main class="main-container">
     <div class="registration-card">
       <div class="character-section">
-        <img src="images/PickbotTrans.png" alt="PickBot" class="pickbot-image"/>
+        <div class="dialogue-bubble">LET'S KEEP GOING!</div>
+        <div class="pickbot-wrapper">
+          <div class="pickbot-character">
+            <img src="images/PickbotTrans.png" alt="PickBot" class="pickbot-image"/>
+            <div class="pickbot-arm left"></div>
+            <div class="pickbot-arm right"></div>
+          </div>
+        </div>
       </div>
 
       <div class="continue-section">

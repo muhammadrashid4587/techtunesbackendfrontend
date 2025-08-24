@@ -1,5 +1,5 @@
-// enhanced_guitar_tuner.js
-// ───── Enhanced Guitar Tuner with Better Pitch Detection ─────────
+// guitar_tuner.js - Updated for Ultra-Accurate Detection
+// ───── Works with your existing HTML/CSS design ─────────
 
 // Audio context initialization
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -16,9 +16,10 @@ document.body.addEventListener('click', () => {
 }, { once: true });
 
 // ───── Configuration ─────────────────────────────────────────
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'http://127.0.0.1:8001';
 const RECORDING_DURATION = 2000; // 2 seconds
 const AUTO_TUNE_INTERVAL = 3000;  // 3 seconds for auto mode
+const ERROR_MARGIN = 5; // Professional accuracy
 
 // Note mapping for frontend string IDs to backend note names
 const STRING_TO_NOTE = {
@@ -40,14 +41,9 @@ let autoMode = true;
 let isRecording = false;
 let autoTuneInterval = null;
 let mediaStream = null;
-let analyserNode = null;
-let scriptProcessor = null;
-
-// Enhanced pitch detection state
-let pitchBuffer = [];
-let pitchHistory = [];
-const PITCH_HISTORY_SIZE = 10;
-const BUFFER_SIZE = 16384; // Larger buffer for better low frequency detection
+let prevDetections = [];
+const STABLE_WINDOW = 3; // require 3 consecutive similar detections
+const MAX_NOTE_DELTA_CENTS = 15; // tolerance for stability
 
 // ───── DOM Elements ─────────────────────────────────────────
 let elements = {};
@@ -60,7 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
     meters: document.querySelectorAll('.string-meter'),
     meterArrows: document.querySelectorAll('.meter-arrow'),
     toggle: document.getElementById('autoToggle'),
-    toggleLabel: document.querySelector('.toggle-label')
+    toggleLabel: document.querySelector('.toggle-label'),
+    levelFill: document.getElementById('levelFill'),
+    confidenceBadge: document.getElementById('confidenceBadge')
   };
 
   // Initialize event listeners
@@ -71,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (autoMode) {
     startAutoTuning();
   }
+  
+  // Show startup message
+  updateTuningStatus('🎸 Ultra-Accurate Tuner Ready! ±5 cents precision', 'ready');
 });
 
 // ───── Event Listeners ─────────────────────────────────────
@@ -92,14 +93,15 @@ function initEventListeners() {
   elements.toggle.addEventListener('click', toggleMode);
 }
 
-// ───── Enhanced Audio Recording with Real-time Analysis ─────────────────
-async function startEnhancedAudioCapture() {
+// ───── Audio Recording ─────────────────────────────────────
+async function recordAudio(duration = RECORDING_DURATION) {
   try {
+    // Request microphone access with optimal settings
     if (!mediaStream) {
       mediaStream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
-          sampleRate: 44100,
-          channelCount: 1,
+          sampleRate: { ideal: 44100 },
+          channelCount: { ideal: 1 },
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false
@@ -107,175 +109,79 @@ async function startEnhancedAudioCapture() {
       });
     }
 
-    if (!audioCtx) {
-      audioCtx = new AudioContext();
+    // Live level meter via WebAudio analyser
+    const audioSource = audioCtx.createMediaStreamSource(mediaStream);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    audioSource.connect(analyser);
+    const dataArray = new Uint8Array(analyser.fftSize);
+    const levelEl = elements.levelFill;
+    let levelAnim;
+    function updateLevel() {
+      analyser.getByteTimeDomainData(dataArray);
+      // Compute peak-to-peak as rough loudness proxy
+      let min = 255, max = 0;
+      for (let i = 0; i < dataArray.length; i++) { const v = dataArray[i]; if (v < min) min = v; if (v > max) max = v; }
+      const p2p = (max - min) / 255; // 0..1
+      if (levelEl) levelEl.style.width = Math.min(100, Math.max(0, p2p * 140)) + '%';
+      levelAnim = requestAnimationFrame(updateLevel);
     }
+    levelAnim = requestAnimationFrame(updateLevel);
 
-    // Create nodes for real-time analysis
-    const source = audioCtx.createMediaStreamSource(mediaStream);
-    analyserNode = audioCtx.createAnalyser();
-    analyserNode.fftSize = BUFFER_SIZE;
-    analyserNode.smoothingTimeConstant = 0.8;
-
-    // Create bandpass filter for guitar frequencies
-    const highpass = audioCtx.createBiquadFilter();
-    highpass.type = 'highpass';
-    highpass.frequency.value = 70; // Filter out below 70Hz
-    highpass.Q.value = 0.7;
-
-    const lowpass = audioCtx.createBiquadFilter();
-    lowpass.type = 'lowpass';
-    lowpass.frequency.value = 500; // Filter out above 500Hz
-    lowpass.Q.value = 0.7;
-
-    // Connect audio chain
-    source.connect(highpass);
-    highpass.connect(lowpass);
-    lowpass.connect(analyserNode);
-
-    return true;
-  } catch (error) {
-    console.error('Audio capture failed:', error);
-    return false;
-  }
-}
-
-// ───── Enhanced Pitch Detection Algorithm ─────────────────────
-function detectPitchEnhanced(buffer) {
-  // Normalize the buffer
-  let maxVal = 0;
-  for (let i = 0; i < buffer.length; i++) {
-    maxVal = Math.max(maxVal, Math.abs(buffer[i]));
-  }
-  
-  if (maxVal < 0.01) return -1; // Signal too weak
-  
-  // Normalize
-  const normalized = new Float32Array(buffer.length);
-  for (let i = 0; i < buffer.length; i++) {
-    normalized[i] = buffer[i] / maxVal;
-  }
-  
-  // Enhanced autocorrelation with window function
-  const SIZE = normalized.length;
-  const MAX_SAMPLES = Math.floor(SIZE / 2);
-  const correlations = new Array(MAX_SAMPLES);
-  
-  // Apply Hann window to reduce spectral leakage
-  for (let i = 0; i < SIZE; i++) {
-    normalized[i] *= 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (SIZE - 1));
-  }
-  
-  // Calculate autocorrelation
-  for (let i = 0; i < MAX_SAMPLES; i++) {
-    let sum = 0;
-    for (let j = 0; j < MAX_SAMPLES; j++) {
-      sum += normalized[j] * normalized[j + i];
-    }
-    correlations[i] = sum;
-  }
-  
-  // Find the first peak after the zero lag
-  let d = 0;
-  while (correlations[d] > correlations[d + 1]) d++;
-  
-  // Find the highest peak in the range of guitar frequencies
-  let maxval = -1;
-  let maxpos = -1;
-  const minPeriod = Math.floor(audioCtx.sampleRate / 400); // 400 Hz max
-  const maxPeriod = Math.floor(audioCtx.sampleRate / 70);  // 70 Hz min
-  
-  for (let i = minPeriod; i < maxPeriod && i < MAX_SAMPLES; i++) {
-    if (correlations[i] > maxval) {
-      maxval = correlations[i];
-      maxpos = i;
-    }
-  }
-  
-  // Use parabolic interpolation for better accuracy
-  let T0 = maxpos;
-  if (maxpos > 0 && maxpos < correlations.length - 1) {
-    const y1 = correlations[maxpos - 1];
-    const y2 = correlations[maxpos];
-    const y3 = correlations[maxpos + 1];
+    // Create MediaRecorder with best available format
+    let options = { audioBitsPerSecond: 128000 };
     
-    const a = (y1 - 2 * y2 + y3) / 2;
-    const b = (y3 - y1) / 2;
+    // Try different mime types in order of preference
+    const mimeTypes = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/ogg'
+    ];
     
-    if (a) T0 = maxpos - b / (2 * a);
-  }
-  
-  // Calculate confidence based on correlation strength
-  const confidence = correlations[maxpos] / correlations[0];
-  
-  if (confidence < 0.9) return -1; // Not confident enough
-  
-  return audioCtx.sampleRate / T0;
-}
-
-// ───── Enhanced Recording with Continuous Analysis ─────────────────
-async function recordAndAnalyzeAudio(duration = RECORDING_DURATION) {
-  try {
-    // Ensure audio capture is started
-    if (!analyserNode) {
-      const success = await startEnhancedAudioCapture();
-      if (!success) throw new Error('Failed to start audio capture');
-    }
-
-    // Show recording indicator
-    updateTuningStatus('🎤 Listening... Play your note clearly', 'recording');
-    
-    isRecording = true;
-    const startTime = Date.now();
-    const frequencies = [];
-    
-    // Continuous analysis during recording
-    const analyzeFrame = () => {
-      if (!isRecording || Date.now() - startTime > duration) {
-        isRecording = false;
-        
-        // Process collected frequencies
-        if (frequencies.length > 0) {
-          // Use median for stability
-          frequencies.sort((a, b) => a - b);
-          const medianFreq = frequencies[Math.floor(frequencies.length / 2)];
-          
-          // Add to history for smoothing
-          pitchHistory.push(medianFreq);
-          if (pitchHistory.length > PITCH_HISTORY_SIZE) {
-            pitchHistory.shift();
-          }
-          
-          // Calculate average from recent history
-          const avgFreq = pitchHistory.reduce((a, b) => a + b, 0) / pitchHistory.length;
-          
-          return avgFreq;
-        }
-        return null;
+    for (const mimeType of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(mimeType)) {
+        options.mimeType = mimeType;
+        break;
       }
-      
-      // Get time domain data
-      const buffer = new Float32Array(analyserNode.fftSize);
-      analyserNode.getFloatTimeDomainData(buffer);
-      
-      // Detect pitch
-      const frequency = detectPitchEnhanced(buffer);
-      if (frequency > 0) {
-        frequencies.push(frequency);
+    }
+
+    const mediaRecorder = new MediaRecorder(mediaStream, options);
+    const audioChunks = [];
+
+    // Collect audio data
+    mediaRecorder.ondataavailable = event => {
+      if (event.data.size > 0) {
+        audioChunks.push(event.data);
       }
-      
-      // Continue analysis
-      requestAnimationFrame(analyzeFrame);
     };
+
+    // Start recording
+    mediaRecorder.start();
+    isRecording = true;
     
-    // Start analysis loop
-    return new Promise((resolve) => {
-      analyzeFrame();
-      setTimeout(() => {
+    // Visual feedback
+    showRecordingAnimation();
+    
+    // Stop after duration
+    setTimeout(() => {
+      if (mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+    }, duration);
+
+    // Return promise that resolves with audio blob
+    return new Promise((resolve, reject) => {
+      mediaRecorder.onstop = () => {
         isRecording = false;
-        const result = analyzeFrame();
-        resolve(result);
-      }, duration);
+        hideRecordingAnimation();
+        if (levelAnim) cancelAnimationFrame(levelAnim);
+        const audioBlob = new Blob(audioChunks, { type: options.mimeType || 'audio/webm' });
+        console.log(`🎵 Recording complete: ${audioBlob.size} bytes`);
+        resolve(audioBlob);
+      };
+      
+      mediaRecorder.onerror = reject;
     });
 
   } catch (error) {
@@ -285,7 +191,7 @@ async function recordAndAnalyzeAudio(duration = RECORDING_DURATION) {
   }
 }
 
-// ───── Enhanced Backend Communication ─────────────────────────────────
+// ───── Backend Communication ─────────────────────────────────
 async function sendAudioForTuning(audioBlob, targetNote = null) {
   try {
     const formData = new FormData();
@@ -295,6 +201,8 @@ async function sendAudioForTuning(audioBlob, targetNote = null) {
       formData.append('note', targetNote);
     }
 
+    console.log('📤 Sending to ultra-accurate server...');
+
     const response = await fetch(`${API_BASE_URL}/tune`, {
       method: 'POST',
       body: formData
@@ -302,104 +210,143 @@ async function sendAudioForTuning(audioBlob, targetNote = null) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Server error: ${errorText}`);
+      console.error('Server error:', errorText);
+      
+      // Parse error message
+      try {
+        const errorJson = JSON.parse(errorText);
+        throw new Error(errorJson.detail || 'Server error');
+      } catch {
+        throw new Error('Server error: ' + response.status);
+      }
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log('📥 Analysis result:', result);
+    return result;
+    
   } catch (error) {
     console.error('Failed to analyze audio:', error);
-    
-    // Fallback to client-side detection if server is down
-    if (error.message.includes('Failed to fetch')) {
-      console.log('Using client-side pitch detection as fallback');
-      return null; // Signal to use client-side result
-    }
     throw error;
   }
 }
 
-// ───── Enhanced Tuning Logic ─────────────────────────────────────────
+// ───── Tuning Logic ─────────────────────────────────────────
 async function tuneCurrentString() {
   if (isRecording) return;
 
   try {
-    // Use enhanced client-side analysis
-    const detectedFrequency = await recordAndAnalyzeAudio();
+    // Show recording indicator
+    updateTuningStatus('🎤 Listening... Play a single note clearly', 'recording');
     
-    if (!detectedFrequency || detectedFrequency <= 0) {
-      updateTuningStatus('❌ No clear pitch detected. Try playing louder.', 'error');
-      return;
-    }
+    // Record audio
+    const audioBlob = await recordAudio();
     
-    // Find closest note
-    let closestNote = null;
-    let minCentsDiff = Infinity;
-    let targetFreq = 0;
+    // Show processing indicator
+    updateTuningStatus('🔬 Analyzing with advanced algorithms...', 'processing');
     
-    const noteFrequencies = {
-      'E2': 82.41,
-      'A2': 110.00,
-      'D3': 146.83,
-      'G3': 196.00,
-      'B3': 246.94,
-      'E4': 329.63
+    // Get target note for current string (only in manual mode)
+    const targetNote = autoMode ? null : STRING_TO_NOTE[currentString];
+    
+    // Send to backend for analysis
+    const tuningData = await sendAudioForTuning(audioBlob, targetNote);
+    
+    // Stable detection: require consistent detections across window
+    const detection = {
+      note: tuningData.note,
+      cents: tuningData.cents || 0,
+      confidence: tuningData.confidence || 0,
+      ts: Date.now()
     };
-    
-    for (const [note, freq] of Object.entries(noteFrequencies)) {
-      const cents = 1200 * Math.log2(detectedFrequency / freq);
-      if (Math.abs(cents) < Math.abs(minCentsDiff)) {
-        minCentsDiff = cents;
-        closestNote = note;
-        targetFreq = freq;
+    prevDetections.push(detection);
+    if (prevDetections.length > STABLE_WINDOW) prevDetections.shift();
+
+    // compute stability
+    const allSameNote = prevDetections.every(d => d.note === detection.note);
+    const maxDelta = Math.max(...prevDetections.map(d => Math.abs(d.cents - detection.cents)));
+    const avgConf = prevDetections.reduce((s,d)=>s+(d.confidence||0),0)/prevDetections.length;
+    const isStable = allSameNote && maxDelta <= MAX_NOTE_DELTA_CENTS && avgConf >= 0.6;
+
+    // Update quality/confidence badge
+    if (elements.confidenceBadge) {
+      elements.confidenceBadge.textContent = `${Math.round((tuningData.confidence||0)*100)} %`;
+    }
+
+    if (isStable) {
+      // Update UI with results
+      updateTunerUI(tuningData);
+    } else {
+      // Show transient hint without switching meters
+      const meterString = NOTE_TO_STRING[tuningData.note] || currentString;
+      const currentMeter = document.getElementById(`meter-${meterString}`);
+      if (currentMeter) {
+        const arrow = currentMeter.querySelector('.meter-arrow');
+        if (arrow) {
+          const maxCents = 50;
+          const maxRotation = 45;
+          const rotation = Math.max(-maxRotation, Math.min(maxRotation, (tuningData.cents / maxCents) * maxRotation));
+          arrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+        }
       }
+      updateTuningStatus(`👂 Detected ${tuningData.note} (stabilizing…)`, 'processing');
     }
-    
-    // Create tuning data object
-    const tuningData = {
-      note: closestNote,
-      frequency: detectedFrequency,
-      target_frequency: targetFreq,
-      cents: minCentsDiff,
-      in_tune: Math.abs(minCentsDiff) <= 5,
-      direction: minCentsDiff > 0 ? 'sharp' : (minCentsDiff < 0 ? 'flat' : 'perfect')
-    };
-    
-    // Update UI with enhanced feedback
-    updateTunerUIEnhanced(tuningData);
     
   } catch (error) {
     console.error('Tuning failed:', error);
-    updateTuningStatus('❌ Error: ' + error.message, 'error');
+    
+    let errorMessage = '❌ ';
+    if (error.message.includes('No clear pitch')) {
+      errorMessage += 'No note detected - Play louder or closer to mic';
+    } else if (error.message.includes('Audio too short')) {
+      errorMessage += 'Recording too short - Try again';
+    } else if (error.message.includes('outside guitar range')) {
+      errorMessage += 'Frequency outside guitar range';
+    } else if (error.message.includes('Failed to fetch')) {
+      errorMessage += 'Server connection error - Check if server is running';
+    } else {
+      errorMessage += error.message;
+    }
+    
+    updateTuningStatus(errorMessage, 'error');
   }
 }
 
-// ───── Enhanced UI Updates with Better Feedback ─────────────────────────
-function updateTunerUIEnhanced(tuningData) {
-  console.log('Tuning result:', tuningData);
+// ───── UI Updates ─────────────────────────────────────────
+function updateTunerUI(tuningData) {
+  console.log('🎯 Tuning result:', tuningData);
+  
+  // Validate data
+  if (!tuningData || !tuningData.note) {
+    console.error('Invalid tuning data');
+    return;
+  }
   
   // Map backend note to frontend string
   const detectedString = NOTE_TO_STRING[tuningData.note];
   
-  if (detectedString) {
+  if (detectedString && autoMode) {
     // In auto mode, switch to detected string
-    if (autoMode) {
-      selectString(detectedString);
-    }
+    selectString(detectedString);
   }
   
-  // Update meter arrow with smooth animation
-  const currentMeter = document.getElementById(`meter-${detectedString || currentString}`);
+  // Update meter arrow
+  const meterString = detectedString || currentString;
+  const currentMeter = document.getElementById(`meter-${meterString}`);
+  
   if (currentMeter) {
     const arrow = currentMeter.querySelector('.meter-arrow');
     if (arrow) {
-      // Enhanced rotation calculation with easing
+      // Calculate arrow rotation based on cents
       const maxCents = 50;
       const maxRotation = 45;
-      let rotation = (tuningData.cents / maxCents) * maxRotation;
+      
+      // Use logarithmic scale for better visual feedback
+      let visualCents = Math.sign(tuningData.cents) * Math.log(Math.abs(tuningData.cents) + 1) / Math.log(maxCents + 1) * maxCents;
+      let rotation = (visualCents / maxCents) * maxRotation;
       rotation = Math.max(-maxRotation, Math.min(maxRotation, rotation));
       
-      // Apply smooth transition
-      arrow.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      // Apply rotation with smooth transition
+      arrow.style.transition = 'transform 0.3s ease-out';
       arrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
       
       // Update arrow image based on tuning status
@@ -413,32 +360,66 @@ function updateTunerUIEnhanced(tuningData) {
     }
   }
   
-  // Enhanced status message with frequency info
+  // Create detailed status message
   const freqDisplay = `${tuningData.frequency.toFixed(1)}Hz`;
   const targetDisplay = `(target: ${tuningData.target_frequency.toFixed(1)}Hz)`;
+  const confidenceDisplay = tuningData.confidence ? ` • ${(tuningData.confidence * 100).toFixed(0)}% conf` : '';
   
   if (tuningData.in_tune) {
-    updateTuningStatus(`✅ Perfect! ${tuningData.note} - ${freqDisplay}`, 'in-tune');
+    updateTuningStatus(
+      `✅ Perfect! ${tuningData.note} - ${freqDisplay}${confidenceDisplay}`, 
+      'in-tune'
+    );
+    // Play success sound
+    playSuccessSound();
   } else {
-    const direction = tuningData.direction === 'sharp' ? 'too high ⬇️' : 'too low ⬆️';
     const centsAbs = Math.abs(tuningData.cents).toFixed(1);
+    const direction = tuningData.direction === 'sharp' ? 'HIGH ⬇️' : 'LOW ⬆️';
     
-    // Add specific tuning instructions
+    // Tuning instructions based on deviation
     let instruction = '';
-    if (Math.abs(tuningData.cents) > 20) {
+    if (Math.abs(tuningData.cents) > 30) {
       instruction = tuningData.direction === 'sharp' ? 
-        ' - Turn peg counter-clockwise' : 
-        ' - Turn peg clockwise';
+        ' Turn peg LEFT' : ' Turn peg RIGHT';
+    } else if (Math.abs(tuningData.cents) > 10) {
+      instruction = ' Small adjustment';
+    } else {
+      instruction = ' Almost there!';
     }
     
     updateTuningStatus(
-      `${tuningData.note}: ${centsAbs}¢ ${direction} ${targetDisplay}${instruction}`, 
+      `${tuningData.note}: ${centsAbs}¢ ${direction} ${targetDisplay}${instruction}${confidenceDisplay}`, 
       'out-of-tune'
     );
   }
+  
+  // Show low confidence warning if needed
+  if (tuningData.confidence && tuningData.confidence < 0.7) {
+    setTimeout(() => {
+      updateTuningStatus(
+        '⚠️ Low confidence - Try playing clearer or check for noise', 
+        'warning'
+      );
+    }, 2500);
+  }
 }
 
-// Keep all the original UI functions unchanged
+// ───── Visual Feedback ─────────────────────────────────────
+function showRecordingAnimation() {
+  // Add pulsing effect to all string letters during recording
+  elements.letters.forEach(letter => {
+    letter.style.animation = 'pulse 1s infinite';
+  });
+}
+
+function hideRecordingAnimation() {
+  // Remove animation
+  elements.letters.forEach(letter => {
+    letter.style.animation = '';
+  });
+}
+
+// ───── Original UI Functions (unchanged) ─────────────────────
 function selectString(stringKey) {
   // Clear all active states
   elements.strings.forEach(el => el.classList.remove('active'));
@@ -487,12 +468,21 @@ function updateTuningStatus(message, className) {
       border: 1px solid rgba(255,255,255,0.2);
       z-index: 100;
       transition: all 0.3s ease;
+      white-space: nowrap;
     `;
     document.querySelector('.tuner-container').appendChild(statusEl);
   }
   
   statusEl.textContent = message;
   statusEl.className = className;
+  
+  // Add pulse animation for certain states
+  if (className === 'in-tune') {
+    statusEl.style.animation = 'successPulse 0.5s ease-out';
+    setTimeout(() => {
+      statusEl.style.animation = '';
+    }, 500);
+  }
 }
 
 function toggleMode() {
@@ -511,11 +501,6 @@ function toggleMode() {
 
 function startAutoTuning() {
   stopAutoTuning(); // Clear any existing interval
-  
-  // Start continuous analysis immediately
-  if (!analyserNode) {
-    startEnhancedAudioCapture();
-  }
   
   autoTuneInterval = setInterval(() => {
     if (autoMode && !isRecording) {
@@ -565,6 +550,28 @@ function playReferenceNote(stringKey) {
   oscillator.stop(audioCtx.currentTime + 1);
 }
 
+function playSuccessSound() {
+  if (!audioCtx || audioCtx.state !== 'running') return;
+  
+  // Play a pleasant success sound
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  // Play C-E notes
+  osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+  osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+  
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01);
+  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+  
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + 0.2);
+}
+
 function goHome() {
   // Clean up resources before leaving
   if (mediaStream) {
@@ -577,17 +584,42 @@ function goHome() {
 
 function showPickbot() {
   const messages = [
-    "🎸 Welcome to the Enhanced Guitar Tuner! Now with better pitch detection!",
-    "🎵 Toggle between Automatic and Manual modes using the switch above.",
-    "🎤 Make sure to allow microphone access for tuning to work.",
-    "🎯 Play each string clearly for the best tuning results!",
-    "💡 Tip: The closer to 0 cents, the more in tune you are!",
-    "🔧 Enhanced algorithm now detects low E string more accurately!"
+    "🎸 Ultra-Accurate Tuner: Professional ±5 cents precision!",
+    "🎵 Using 5 advanced pitch detection algorithms!",
+    "🎤 For best results, play one string at a time clearly.",
+    "🎯 Green arrow = Perfect tuning within 5 cents!",
+    "💡 Tip: If detecting harmonics, try playing softer.",
+    "🔧 Manual mode lets you focus on one string at a time."
   ];
   
   const randomMessage = messages[Math.floor(Math.random() * messages.length)];
   alert(`PickBot: ${randomMessage}`);
 }
+
+// Add CSS animation for success pulse
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  
+  @keyframes successPulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  
+  .in-tune { color: #51cf66 !important; }
+  .out-of-tune { color: #ffd43b !important; }
+  .error { color: #ff6b6b !important; }
+  .warning { color: #ff9f43 !important; }
+  .recording { color: #74c0fc !important; }
+  .processing { color: #91a7ff !important; }
+  .ready { color: #69db7c !important; }
+`;
+document.head.appendChild(style);
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {

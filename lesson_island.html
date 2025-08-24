@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechTunes • Lesson Island</title>
+  <link rel="stylesheet" href="css/mousetrail.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      background-image:
+        url('images/Floor.png'),
+        url('images/Brick_Wall.png'),
+        url('images/Light.png');
+      background-size:
+        100%,
+        cover,
+        100%;
+      background-position:
+        bottom,
+        center,
+        top left;
+      background-repeat:
+        no-repeat,
+        no-repeat,
+        no-repeat;
+      background-attachment:
+        scroll;
+    }
+
+
+
+    .topbar { position: absolute; top: 16px; left: 16px; z-index: 4; }
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #ef09d0;
+      color: #0b0820;
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow:
+        0 6px 20px rgba(239, 9, 208, 0.45),
+        inset 0 0 0 1px rgba(255,255,255,0.15);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .back:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .back:focus-visible {
+      outline: 3px solid rgba(239, 9, 208, 0.8);
+      outline-offset: 2px;
+    }
+
+    /* Selector UI */
+    .headline {
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 3;
+    }
+    .headline .title {
+      margin: 0;
+      font-weight: 900;
+      font-size: clamp(28px, 6vw, 56px);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(90deg, #ffffff, #ef09d0, #7e5bef);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow:
+        0 0 20px rgba(239, 9, 208, 0.35),
+        0 0 40px rgba(126, 91, 239, 0.25);
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+    }
+    .headline .title::after {
+      content: '';
+      display: block;
+      width: 60%;
+      height: 3px;
+      margin: 8px auto 0;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(239,9,208,0.9) 0%, rgba(239,9,208,0.2) 60%, rgba(239,9,208,0) 70%);
+      box-shadow: 0 0 12px rgba(239,9,208,0.6);
+    }
+    .selector {
+      position: absolute;
+      left: 50%;
+      bottom: 30%;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      grid-auto-rows: auto;
+      align-items: center;
+      gap: 22px;
+      padding: 22px 24px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      z-index: 2;
+      width: min(1040px, 94vw);
+      overflow: visible;
+    }
+    .selector::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 24px;
+      background: linear-gradient(90deg, rgba(239,9,208,0.25), rgba(126,91,239,0.25));
+      filter: blur(20px);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .selector::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -18px;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(239,9,208,0.8) 0%, rgba(239,9,208,0.15) 60%, rgba(239,9,208,0) 70%);
+      box-shadow: 0 0 16px rgba(239,9,208,0.6);
+      pointer-events: none;
+    }
+    .arrow {
+      width: 64px; height: 64px;
+      display: grid; place-items: center;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(0,0,0,0.5); color: #fff;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+      user-select: none;
+    }
+    .arrow:hover { transform: scale(1.05); background: rgba(0,0,0,0.6); }
+    .display {
+      display: grid;
+      grid-auto-rows: auto;
+      justify-items: center;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+    .icon { font-size: clamp(56px, 9vw, 96px); filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35)); }
+    .meta { display: grid; gap: 6px; justify-items: center; text-align: center; }
+    .name { font-size: clamp(26px, 5vw, 36px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+    .status { font-size: 14px; opacity: 0.9; }
+    .cta {
+      grid-column: 1 / -1;
+      justify-self: center;
+      margin-top: 6px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: none;
+      font-weight: 800;
+      font-size: 1.05rem;
+      cursor: pointer;
+      background: #ef09d0; color: #0b0820;
+      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+      text-decoration: none;
+    }
+    .cta:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .cta[aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+
+    @media (max-width: 720px) {
+      .selector { grid-template-columns: 1fr; gap: 12px; text-align: center; bottom: 24%; }
+      .display { justify-content: center; }
+      .cta { justify-self: center; width: 100%; }
+    }
+
+    /* Floating musical symbols */
+    .floating-symbols {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .musical-symbol {
+      position: absolute;
+      color: rgba(255,255,255,0.1);
+      font-size: 2rem;
+      animation: float 15s linear infinite;
+      user-select: none;
+    }
+    .musical-symbol:nth-child(odd) {
+      color: rgba(76,26,128,0.7);
+    }
+    .musical-symbol:nth-child(3n) {
+      color: rgba(0,61,77,0.6);
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+    .pulse { animation: float 15s linear infinite, pulse 3s ease-in-out infinite; }
+    .glow { text-shadow: 0 0 10px currentColor; }
+  </style>
+</head>
+<body>
+  <div class="logo"></div>
+  <div class="topbar">
+    <a class="back" href="homepage.html">← Home</a>
+    <a class="back" href="instructor.html" style="margin-left:8px; background:#7e5bef; color:#fff;">Instructor</a>
+    <a class="back" href="admin.html" style="margin-left:8px; background:#7e5bef; color:#fff;">Admin</a>
+  </div>
+  <div class="headline"><h1 class="title">Choose your instrument</h1></div>
+
+  <div id="floating-symbols" class="floating-symbols"></div>
+
+  <div class="selector" role="group" aria-label="Instrument selector">
+    <button class="arrow" id="prev" aria-label="Previous">‹</button>
+    <div class="display">
+      <div class="icon" id="icon">🎸</div>
+      <div class="meta">
+        <div class="name" id="name">Guitar</div>
+        <div class="status" id="status">Available</div>
+      </div>
+    </div>
+    <button class="arrow" id="next" aria-label="Next">›</button>
+    <a class="cta" id="cta" href="lessons_guitar.html">Enter</a>
+  </div>
+
+  <script src="js/mousetrail.js"></script>
+  <script>
+    const instruments = [
+      { name: 'Guitar', icon: '🎸', enabled: true, href: 'lessons_guitar.html' },
+      { name: 'Piano', icon: '🎹', enabled: false },
+      { name: 'Drums', icon: '🥁', enabled: false },
+      { name: 'Violin', icon: '🎻', enabled: false },
+    ];
+
+    let index = 0;
+    const iconEl = document.getElementById('icon');
+    const nameEl = document.getElementById('name');
+    const statusEl = document.getElementById('status');
+    const ctaEl = document.getElementById('cta');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+
+    function update() {
+      const item = instruments[index];
+      iconEl.textContent = item.icon;
+      nameEl.textContent = item.name;
+      if (item.enabled) {
+        statusEl.textContent = 'Available';
+        ctaEl.textContent = 'Enter';
+        ctaEl.removeAttribute('aria-disabled');
+        ctaEl.setAttribute('href', item.href || '#');
+      } else {
+        statusEl.textContent = 'Coming soon';
+        ctaEl.textContent = 'Coming soon';
+        ctaEl.setAttribute('aria-disabled', 'true');
+        ctaEl.removeAttribute('href');
+      }
+    }
+
+    prevBtn.addEventListener('click', () => { index = (index - 1 + instruments.length) % instruments.length; update(); });
+    nextBtn.addEventListener('click', () => { index = (index + 1) % instruments.length; update(); });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevBtn.click();
+      if (e.key === 'ArrowRight') nextBtn.click();
+      if (e.key === 'Enter' && !ctaEl.hasAttribute('aria-disabled') && ctaEl.getAttribute('href')) {
+        window.location.href = ctaEl.getAttribute('href');
+      }
+    });
+
+    update();
+
+    // Floating symbols
+    const symbols = ['♪','♫','♬','♭','♯','♩','♮','𝄞','𝄢'];
+    const floatContainer = document.getElementById('floating-symbols');
+    function createSymbol() {
+      const el = document.createElement('div');
+      el.className = 'musical-symbol';
+      if (Math.random() < 0.3) el.classList.add('pulse');
+      if (Math.random() < 0.2) el.classList.add('glow');
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      el.style.left = Math.random() * 100 + '%';
+      el.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+      el.style.animationDelay = Math.random() * 5 + 's';
+      el.style.animationDuration = (Math.random() * 10 + 10) + 's';
+      floatContainer.appendChild(el);
+      setTimeout(() => el.remove(), 20000);
+    }
+    for (let i = 0; i < 8; i++) setTimeout(createSymbol, i * 500);
+    setInterval(createSymbol, 2000);
+
+    document.addEventListener('mousemove', (e) => {
+      const syms = document.querySelectorAll('.musical-symbol');
+      const mx = e.clientX / window.innerWidth - 0.5;
+      const my = e.clientY / window.innerHeight - 0.5;
+      syms.forEach((sym, i) => {
+        const speed = (i % 3 + 1) * 0.5;
+        sym.style.transform = `translate(${mx * speed}px,${my * speed}px)`;
+      });
+    });
+  </script>
+</body>
+</html>

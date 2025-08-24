@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechTunes • Guitar Lessons</title>
+  <link rel="stylesheet" href="css/mousetrail.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      background-image:
+        url('images/Floor.png'),
+        url('images/Brick_Wall.png'),
+        url('images/Light.png');
+      background-size:
+        100%,
+        cover,
+        100%;
+      background-position:
+        bottom,
+        center,
+        top left;
+      background-repeat:
+        no-repeat,
+        no-repeat,
+        no-repeat;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 28px 24px;
+      color: #fff;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      text-align: center;
+      width: min(680px, 92vw);
+    }
+    h1 { margin: 0 0 8px; }
+    p { margin: 0 0 16px; opacity: 0.9; }
+    a { color: #fff; }
+    .cta { display: inline-block; margin-top: 8px; padding: 10px 14px; border-radius: 10px; background: #ef09d0; color: #0b0820; text-decoration: none; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Guitar Lessons</h1>
+    <p>Placeholder page. Share lesson flow and assets, and I'll build the full experience (units, progress, videos, exercises).</p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
+      <a class="cta" href="lesson_island.html">← Back to instruments</a>
+      <a class="cta" href="homepage.html">Home</a>
+      <a class="cta" href="reg7.html">Choose your music →</a>
+    </div>
+  </div>
+  <script src="js/mousetrail.js"></script>
+</body>
+</html>
