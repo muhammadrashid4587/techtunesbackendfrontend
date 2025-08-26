@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Avatar Creator • TechTunes</title>
   <link rel="stylesheet" href="css/profile.css" />
+
   <style>
     body {
       margin: 0;
@@ -13,24 +14,14 @@
       background-attachment: fixed;
       overflow: hidden;
     }
-    .container {
-      position: relative;
-      display: flex;
-      width: 100vw;
-      height: 100vh;
-    }
-    .left-panel {
-      width: 50%;
-      position: relative;
-      display: block;
-    }
+    .container { position: relative; display: flex; width: 100vw; height: 100vh; }
+    .left-panel { width: 50%; position: relative; display: block; }
     .mirror {
       position: relative;
       bottom: 150px;
       left: 50%;
       transform: translateX(-50%);
-      width: 450px;
-      height: 1100px;
+      width: 450px; height: 1100px;
       background: url('images/Background/mirror.png') center/contain no-repeat;
       z-index: 1;
     }
@@ -42,113 +33,60 @@
       z-index: 2;
     }
     .stand {
-      position: absolute; bottom: -20px; left: 57%; 
+      position: absolute; bottom: -20px; left: 57%;
       transform: translateX(-50%);
       width: 200px; height: 325px;
       background: url('images/Background/Stand@4x.png') center/contain no-repeat;
       z-index: 2;
     }
-    .floor {
-      position: fixed; bottom: 0; left: 0;
-      width: 100vw; height: auto; z-index: 0;
-    }
-    .wheel-wrap {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 0 auto;
-    }
+    .floor { position: fixed; bottom: 0; left: 0; width: 100vw; height: auto; z-index: 0; }
+    .wheel-wrap { position: relative; width: 300px; height: 300px; margin: 0 auto; }
     .wheel-pointer {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      top: -12px;
-      width: 0;
-      height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-bottom: 24px solid #fff;
-      z-index: 5;
-      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35));
+      position: absolute; left: 50%; transform: translateX(-50%); top: -12px;
+      width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
+      border-bottom: 24px solid #fff; z-index: 5; filter: drop-shadow(0 2px 0 rgba(0,0,0,.35));
     }
     .wheel-pointer::after {
-      content: "";
-      position: absolute;
-      left: -9px;
-      top: 4px;
-      border-left: 9px solid transparent;
-      border-right: 9px solid transparent;
-      border-bottom: 18px solid #e74c3c;
+      content: ""; position: absolute; left: -9px; top: 4px;
+      border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 18px solid #e74c3c;
     }
 
     /* ---- AVATAR LAYERS ---- */
     #avatar-base {
-      position: absolute; 
-      bottom: 200px;
-      left: 50%; 
-      transform: translateX(-50%);
-      width: 220px; 
-      height: 300px;
-      z-index: 4;
-      background-color: #ffffff;
-      mask-image: url("images/ogbot.png");
-      mask-repeat: no-repeat;
-      mask-position: center;
-      mask-size: contain;
+      position: absolute; bottom: 200px; left: 50%; transform: translateX(-50%);
+      width: 220px; height: 300px; z-index: 4; background-color: #ffffff;
+      mask-image: url("images/ogbot.png"); mask-repeat: no-repeat; mask-position: center; mask-size: contain;
     }
-
     #layer-hands {
-      position: absolute; bottom: 300px;
-      left: 50%; transform: translateX(-50%) scaleX(1.2);
+      position: absolute; bottom: 300px; left: 50%; transform: translateX(-50%) scaleX(1.2);
       width: 180px; z-index: 5;
     }
     #layer-eyes {
-      position: absolute; bottom: 330px;
-      left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 330px; left: 50%; transform: translateX(-50%);
       width: 80px; z-index: 6;
     }
     #layer-mouth {
-      position: absolute; bottom: 280px;
-      left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 280px; left: 50%; transform: translateX(-50%);
       width: 60px; z-index: 7;
     }
+    /* Drag-friendly accessories layer */
     #layer-accessories {
-      position: absolute; bottom: 360px;
-      left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 360px; left: 50%; transform: translateX(-50%);
       width: 120px; z-index: 8;
+      cursor: grab; user-select: none; -webkit-user-drag: none; pointer-events: auto; touch-action: none;
     }
+    #layer-accessories.dragging { cursor: grabbing; }
 
-    .right-panel {
-      width: 50%;
-      display: flex; flex-direction: column;
-      align-items: center; padding-top: 30px;
-    }
-
+    .right-panel { width: 50%; display: flex; flex-direction: column; align-items: center; padding-top: 30px; }
     .toolbar { display: flex; gap: 20px; margin-top: 20px; }
     .toolbar img { width: 60px; height: auto; cursor: pointer; }
-
     #resetBtn, #saveAvatarBtn {
-      margin-top: 10px; padding: 10px 20px;
-      border: none; border-radius: 8px;
-      background: #4DB8FF; color: #fff;
-      font-size: 16px; cursor: pointer;
-      transition: background 0.2s;
+      margin-top: 10px; padding: 10px 20px; border: none; border-radius: 8px;
+      background: #4DB8FF; color: #fff; font-size: 16px; cursor: pointer; transition: background .2s;
     }
     #resetBtn:hover, #saveAvatarBtn:hover { background: #3aa8e0; }
-
-    /* Options container */
-    #optionBox {
-      display: flex; flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin: 15px 0;
-    }
-    #optionBox img {
-      width: 60px; height: 60px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: transform 0.2s;
-    }
+    #optionBox { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 15px 0; }
+    #optionBox img { width: 60px; height: 60px; cursor: pointer; border-radius: 8px; transition: transform .2s; }
     #optionBox img:hover { transform: scale(1.1); }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -173,7 +111,6 @@
     </div>
 
     <div class="right-panel">
-      <!-- Spin Wheel -->
       <div style="text-align:center; margin:20px;">
         <div class="wheel-wrap">
           <canvas id="colorWheel" width="300" height="300"></canvas>
@@ -182,7 +119,6 @@
         <button id="spinBtn" style="margin-top:15px; padding:10px 20px;">Spin</button>
       </div>
 
-      <!-- Options for accessories -->
       <div id="optionBox"></div>
 
       <div class="toolbar">
@@ -197,7 +133,7 @@
   </div>
 
   <script>
-    // Categories & Files
+    // ---------------- Data ----------------
     const folderMap = { hands: 'Hands', eyes: 'Eyes', mouth: 'Mouth', accessories: 'Accessories' };
     const files = {
       hands: ['Base Hands@4x.png','Bent Hands@4x.png','Down Hands@4x.png','Raise and Bent Hands@4x.png','Up Hands@4x.png'],
@@ -206,25 +142,45 @@
       accessories: ['Beanie@4x.png','Bow@4x.png','Cowboy Hat@4x.png','Crown@4x.png','Hat@4x.png','Party Hat@4x.png','Purse@4x.png','binoculars@4x.png','braids@4x.png','glasses@4x.png','necklace@4x.png','swoop hair@4x.png','tie@4x.png']
     };
 
-    // Function to get accessory adjustments
+    // ---------------- Presets & storage ----------------
+    const ACCESSORY_PRESETS = {
+      "Beanie@4x.png":       { baseBottom: 470, baseWidth: 140, dx: 28, dy: 0,  scale: 1.00 },
+      "binoculars@4x.png":   { baseBottom: 355, baseWidth: 120, dx: 8,  dy: -6, scale: 1.00 },
+      "Bow@4x.png":          { baseBottom: 472, baseWidth: 120, dx: 22, dy: -2, scale: 1.00 },
+      "braids@4x.png":       { baseBottom: 452, baseWidth: 130, dx: 0,  dy: 10, scale: 1.00 },
+      "Cowboy Hat@4x.png":   { baseBottom: 470, baseWidth: 150, dx: 8,  dy: 0,  scale: 1.00 },
+      "Crown@4x.png":        { baseBottom: 485, baseWidth: 120, dx: 0,  dy: 0,  scale: 1.00 },
+      "glasses@4x.png":      { baseBottom: 355, baseWidth: 110, dx: 0,  dy: 0,  scale: 1.00 },
+      "Hat@4x.png":          { baseBottom: 465, baseWidth: 140, dx: 26, dy: -6, scale: 1.00 },
+      "necklace@4x.png":     { baseBottom: 250, baseWidth: 120, dx: 0,  dy: -28,scale: 1.00 },
+      "Party Hat@4x.png":    { baseBottom: 475, baseWidth: 120, dx: 15, dy: 0,  scale: 1.00 },
+      "Purse@4x.png":        { baseBottom: 190, baseWidth: 120, dx: 56, dy: -34,scale: 0.95 },
+      "swoop hair@4x.png":   { baseBottom: 462, baseWidth: 140, dx: -10,dy: 0,  scale: 1.00 },
+      "tie@4x.png":          { baseBottom: 235, baseWidth: 70,  dx: 0,  dy: -12,scale: 1.00 }
+    };
+
     function getAccessoryAdjustments() {
-      try { 
-        return JSON.parse(localStorage.getItem('accessory_adjustments')) || {}; 
-      }
-      catch { 
-        return {}; 
-      }
+      try { return JSON.parse(localStorage.getItem('accessory_adjustments')) || {}; }
+      catch { return {}; }
+    }
+    function mergedAccessoryAdj(fileName) {
+      const preset = ACCESSORY_PRESETS[fileName] || { baseBottom: 360, baseWidth: 120, dx:0, dy:0, scale:1 };
+      const saved  = getAccessoryAdjustments()[fileName] || {};
+      return { ...preset, ...saved };
     }
 
-    // Apply saved offsets to #layer-accessories based on the chosen filename
+    // ---------------- Apply to layer ----------------
     function applyAccessoryAdjustments(fileName) {
-      const adj = getAccessoryAdjustments()[fileName] || { dx:0, dy:0, scale:1 };
       const layer = document.getElementById('layer-accessories');
-      // Keep your original anchor (left:50%, bottom set in CSS), then add dx/dy/scale
+      const adj = mergedAccessoryAdj(fileName);
+      layer.style.bottom = adj.baseBottom + 'px';
+      layer.style.width  = adj.baseWidth + 'px';
       layer.style.transform = `translateX(-50%) translate(${adj.dx}px, ${adj.dy}px) scale(${adj.scale})`;
     }
 
-    // Show options
+    // ---------------- Options UI ----------------
+    let currentAccessoryFile = null;
+
     function setOption(category) {
       const box = document.getElementById('optionBox');
       box.innerHTML = '';
@@ -236,25 +192,24 @@
           const layer = document.getElementById(`layer-${category}`);
           layer.src = img.src;
 
-          // Fixed typo: 'acessories' -> 'accessories'
           if (category === 'accessories') {
-            const fileName = file;
-            applyAccessoryAdjustments(fileName);
+            currentAccessoryFile = file;
+            applyAccessoryAdjustments(file);
           }
         };
         box.appendChild(img);
       });
     }
 
-    // Reset avatar
+    // ---------------- Reset / Save ----------------
     function resetAvatar() {
       document.getElementById('avatar-base').style.backgroundColor = '#ffffff';
       ['hands','eyes','mouth','accessories'].forEach(cat => {
         document.getElementById(`layer-${cat}`).src = '';
       });
+      currentAccessoryFile = null;
     }
 
-    // Save avatar
     document.getElementById('saveAvatarBtn').addEventListener('click', () => {
       const mirror = document.querySelector('.mirror');
       html2canvas(mirror, { backgroundColor: null, useCORS: true, allowTaint: true, scale: 2 })
@@ -265,7 +220,82 @@
         });
     });
 
-    // Spin Color Wheel
+    // ---------------- Drag to move (cursor sticks) + wheel to scale ----------------
+    (function enableAccessoryDrag(){
+      const layer = document.getElementById('layer-accessories');
+      const mirror = document.querySelector('.mirror');
+
+      let dragging = false, offsetX = 0, offsetY = 0;
+
+      layer.addEventListener('pointerdown', (e) => {
+        if (!currentAccessoryFile || !layer.src) return;
+        dragging = true;
+        layer.classList.add('dragging');
+        if (layer.setPointerCapture && e.pointerId != null) layer.setPointerCapture(e.pointerId);
+
+        const rect = layer.getBoundingClientRect();
+
+    // Calculate offset from cursor to element center (accounting for scale)
+        const adj = mergedAccessoryAdj(currentAccessoryFile);
+        const scale = adj.scale || 1;
+
+        const realCenterX = rect.left + (rect.width / 2);
+        const realCenterY = rect.top + (rect.height / 2);
+
+        offsetX = e.clientX - realCenterX;
+        offsetY = e.clientY - realCenterY;
+
+        e.preventDefault();
+  });
+
+  layer.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+
+    const mirrorRect = mirror.getBoundingClientRect();
+
+    // Calculate position relative to mirror center
+    const centerX = (e.clientX - mirrorRect.left - mirrorRect.width / 2) - offsetX;
+    const centerY = (e.clientY - mirrorRect.top - mirrorRect.height / 2) - offsetY;
+
+    // Store dx/dy normalized by current scale for consistent drag positioning
+    const store = getAccessoryAdjustments();
+    const adj = mergedAccessoryAdj(currentAccessoryFile);
+
+    store[currentAccessoryFile] = {
+      dx: centerX / adj.scale,
+      dy: centerY / adj.scale,
+      scale: adj.scale || 1
+    };
+
+    localStorage.setItem('accessory_adjustments', JSON.stringify(store));
+    applyAccessoryAdjustments(currentAccessoryFile);
+  });
+
+  const end = (e) => {
+    if(dragging){
+      dragging = false;
+      layer.classList.remove('dragging');
+      e.preventDefault();
+    }
+  };
+  layer.addEventListener('pointerup', end);
+  layer.addEventListener('pointercancel', end);
+
+  // Wheel to scale (0.5x–2x)
+  layer.addEventListener('wheel', (e) => {
+    if (!currentAccessoryFile) return;
+    e.preventDefault();
+    const store = getAccessoryAdjustments();
+    const adj = mergedAccessoryAdj(currentAccessoryFile);
+    let scale = adj.scale || 1;
+    scale = Math.max(0.5, Math.min(2.0, +(scale * (e.deltaY < 0 ? 1.05 : 0.95)).toFixed(3)));
+    store[currentAccessoryFile] = { dx: adj.dx || 0, dy: adj.dy || 0, scale };
+    localStorage.setItem('accessory_adjustments', JSON.stringify(store));
+    applyAccessoryAdjustments(currentAccessoryFile);
+  }, { passive:false });
+})();
+
+    // ---------------- Spin Color Wheel (unchanged) ----------------
     const colors = ["#ff0000","#00ff00","#0000ff","#ffff00","#ff00ff","#00ffff","#ff8000","#8000ff","#ffffff"];
     const canvas = document.getElementById("colorWheel");
     const ctx = canvas.getContext("2d");
@@ -273,30 +303,21 @@
     let startAngle = 0;
     const arc = (2 * Math.PI) / colors.length;
     const TAU = Math.PI * 2;
-    const POINTER_ANGLE = -Math.PI / 2; // arrow at top (12 o'clock)
+    const POINTER_ANGLE = -Math.PI / 2;
 
     function norm(a){ a = a % TAU; return a < 0 ? a + TAU : a; }
-
     function highlightSlice(index){
-      ctx.save();
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.moveTo(150,150);
+      ctx.save(); ctx.lineWidth = 6; ctx.strokeStyle = "#ffffff";
+      ctx.beginPath(); ctx.moveTo(150,150);
       ctx.arc(150,150,150, startAngle + index*arc, startAngle + (index+1)*arc);
-      ctx.closePath();
-      ctx.stroke();
-      ctx.restore();
+      ctx.closePath(); ctx.stroke(); ctx.restore();
     }
-
     function drawWheel() {
       for (let i = 0; i < colors.length; i++) {
-        ctx.beginPath();
-        ctx.fillStyle = colors[i];
+        ctx.beginPath(); ctx.fillStyle = colors[i];
         ctx.moveTo(150, 150);
         ctx.arc(150, 150, 150, startAngle + i * arc, startAngle + (i + 1) * arc);
-        ctx.fill();
-        ctx.stroke();
+        ctx.fill(); ctx.stroke();
       }
     }
     drawWheel();
@@ -313,7 +334,7 @@
         requestAnimationFrame(spin);
       } else {
         const rel = norm(POINTER_ANGLE - startAngle);
-        const EPS = 1e-6;    
+        const EPS = 1e-6;
         const selectedIndex = Math.floor((rel + EPS) / arc);
         const selectedColor = colors[selectedIndex];
 
