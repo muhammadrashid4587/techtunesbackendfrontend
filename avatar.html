@@ -57,6 +57,7 @@
       width: 220px; height: 300px; z-index: 4; background-color: #ffffff;
       mask-image: url("images/ogbot.png"); mask-repeat: no-repeat; mask-position: center; mask-size: contain;
     }
+
     #layer-hands {
       position: absolute; bottom: 300px; left: 50%; transform: translateX(-50%) scaleX(1.2);
       width: 180px; z-index: 5;
@@ -235,7 +236,7 @@
 
         const rect = layer.getBoundingClientRect();
 
-    // Calculate offset from cursor to element center (accounting for scale)
+        // Calculate offset from cursor to element center (accounting for scale)
         const adj = mergedAccessoryAdj(currentAccessoryFile);
         const scale = adj.scale || 1;
 
@@ -246,54 +247,54 @@
         offsetY = e.clientY - realCenterY;
 
         e.preventDefault();
-  });
+      });
 
-  layer.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
+      layer.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
 
-    const mirrorRect = mirror.getBoundingClientRect();
+        const mirrorRect = mirror.getBoundingClientRect();
 
-    // Calculate position relative to mirror center
-    const centerX = (e.clientX - mirrorRect.left - mirrorRect.width / 2) - offsetX;
-    const centerY = (e.clientY - mirrorRect.top - mirrorRect.height / 2) - offsetY;
+        // Calculate position relative to mirror center
+        const centerX = (e.clientX - mirrorRect.left - mirrorRect.width / 2) - offsetX;
+        const centerY = (e.clientY - mirrorRect.top - mirrorRect.height / 2) - offsetY;
 
-    // Store dx/dy normalized by current scale for consistent drag positioning
-    const store = getAccessoryAdjustments();
-    const adj = mergedAccessoryAdj(currentAccessoryFile);
+        // Store dx/dy normalized by current scale for consistent drag positioning
+        const store = getAccessoryAdjustments();
+        const adj = mergedAccessoryAdj(currentAccessoryFile);
 
-    store[currentAccessoryFile] = {
-      dx: centerX / adj.scale,
-      dy: centerY / adj.scale,
-      scale: adj.scale || 1
-    };
+        store[currentAccessoryFile] = {
+          dx: centerX / adj.scale,
+          dy: centerY / adj.scale,
+          scale: adj.scale || 1
+        };
 
-    localStorage.setItem('accessory_adjustments', JSON.stringify(store));
-    applyAccessoryAdjustments(currentAccessoryFile);
-  });
+        localStorage.setItem('accessory_adjustments', JSON.stringify(store));
+        applyAccessoryAdjustments(currentAccessoryFile);
+      });
 
-  const end = (e) => {
-    if(dragging){
-      dragging = false;
-      layer.classList.remove('dragging');
-      e.preventDefault();
-    }
-  };
-  layer.addEventListener('pointerup', end);
-  layer.addEventListener('pointercancel', end);
+      const end = (e) => {
+        if(dragging){
+          dragging = false;
+          layer.classList.remove('dragging');
+          e.preventDefault();
+        }
+      };
+      layer.addEventListener('pointerup', end);
+      layer.addEventListener('pointercancel', end);
 
-  // Wheel to scale (0.5x–2x)
-  layer.addEventListener('wheel', (e) => {
-    if (!currentAccessoryFile) return;
-    e.preventDefault();
-    const store = getAccessoryAdjustments();
-    const adj = mergedAccessoryAdj(currentAccessoryFile);
-    let scale = adj.scale || 1;
-    scale = Math.max(0.5, Math.min(2.0, +(scale * (e.deltaY < 0 ? 1.05 : 0.95)).toFixed(3)));
-    store[currentAccessoryFile] = { dx: adj.dx || 0, dy: adj.dy || 0, scale };
-    localStorage.setItem('accessory_adjustments', JSON.stringify(store));
-    applyAccessoryAdjustments(currentAccessoryFile);
-  }, { passive:false });
-})();
+      // Wheel to scale (0.5x–2x)
+      layer.addEventListener('wheel', (e) => {
+        if (!currentAccessoryFile) return;
+        e.preventDefault();
+        const store = getAccessoryAdjustments();
+        const adj = mergedAccessoryAdj(currentAccessoryFile);
+        let scale = adj.scale || 1;
+        scale = Math.max(0.5, Math.min(2.0, +(scale * (e.deltaY < 0 ? 1.05 : 0.95)).toFixed(3)));
+        store[currentAccessoryFile] = { dx: adj.dx || 0, dy: adj.dy || 0, scale };
+        localStorage.setItem('accessory_adjustments', JSON.stringify(store));
+        applyAccessoryAdjustments(currentAccessoryFile);
+      }, { passive:false });
+    })();
 
     // ---------------- Spin Color Wheel (unchanged) ----------------
     const colors = ["#ff0000","#00ff00","#0000ff","#ffff00","#ff00ff","#00ffff","#ff8000","#8000ff","#ffffff"];

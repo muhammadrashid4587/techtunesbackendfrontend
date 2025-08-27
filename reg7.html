@@ -445,14 +445,14 @@
 /* ─── arms styling ─── */
 .pickbot-arm {
   position: absolute;
-  width: 60px;      /* tweak to match your hand-png size */
-  height: 80px;     /* tweak as needed */
+  width: 990px;      /* tweak to match your hand-png size */
+  height: 100px;     /* tweak as needed */
   background-size: contain;
   background-repeat: no-repeat;
 }
 .pickbot-arm.left {
-  top: 50%;                    /* vertically centered */
-  left: -30px;                 /* stick out to the left */
+  top: 38%;                    /* vertically centered */
+  left: 5px;                 /* stick out to the left */
   transform: translateY(-50%);
   background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
 }
@@ -461,6 +461,13 @@
   right: -30px;                /* stick out to the right */
   transform: translateY(-50%) scaleX(-1); /* flip horizontally */
   background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
+}
+
+.pickbot-leg.left{
+  top: 65%;
+}
+.pickbot-leg.right{
+  top: 65%;
 }
 
 
