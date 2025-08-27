@@ -393,11 +393,9 @@
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import numpy as np
 import io
-import os
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 import logging
@@ -414,18 +412,13 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
-# Static file serving for uploaded content (use absolute path)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
-os.makedirs(UPLOADS_DIR, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
-
 # ───── Config ────────────────────────────────────────────────
 SAMPLE_RATE   = 44100
 ERROR_MARGIN  = 5   # ±5 cents
 GUITAR_NOTES  = { 'E2':82.41,'A2':110.00,'D3':146.83,'G3':196.00,'B3':246.94,'E4':329.63 }
 
 # ───── Admin Config ───────────────────────────────────────────
+import os
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "dev-admin-token")
 INSTRUCTOR_TOKEN = os.getenv("INSTRUCTOR_TOKEN", "dev-instructor-token")
 INSTRUCTOR_PASSWORD = os.getenv("INSTRUCTOR_PASSWORD")
@@ -713,7 +706,7 @@ async def onboarding_save(payload: OnboardingPayload):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001, reload=False)
+    uvicorn.run(app, host="0.0.0.0", port=8001, reload=True)
 
 # ───── Admin Endpoints ────────────────────────────────────────
 @app.post("/admin/login")
@@ -783,62 +776,3 @@ async def create_lesson(course_id: int, lesson: LessonCreate, _: bool = Depends(
 @app.get("/instructor/courses/{course_id}/lessons")
 async def list_lessons(course_id: int, _: bool = Depends(require_instructor)):
     return {"lessons": [l for l in LESSONS if l["course_id"] == course_id]}
-
-@app.post("/instructor/courses/{course_id}/lessons/upload")
-async def upload_lesson(
-    course_id: int,
-    title: str = Form(...),
-    description: str = Form("") ,
-    file: UploadFile = File(...),
-    _: bool = Depends(require_instructor)
-):
-    global LESSON_ID_SEQ
-    if not any(c["id"] == course_id for c in COURSES):
-        raise HTTPException(status_code=404, detail="Course not found")
-
-    # Ensure directory for this course
-    course_dir = os.path.join(UPLOADS_DIR, "courses", str(course_id))
-    os.makedirs(course_dir, exist_ok=True)
-
-    # Build a safe filename with timestamp prefix
-    original = os.path.basename(file.filename or "file")
-    timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    saved_name = f"{timestamp}_{original}"
-    save_path = os.path.join(course_dir, saved_name)
-
-    # Save file
-    try:
-        with open(save_path, "wb") as out:
-            out.write(await file.read())
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {e}")
-
-    # Public URL via static mount
-    public_url = f"/uploads/courses/{course_id}/{saved_name}"
-
-    new_lesson = {
-        "id": LESSON_ID_SEQ,
-        "course_id": course_id,
-        "title": title,
-        "description": description or "",
-        "content_url": public_url,
-        "created_at": datetime.utcnow().isoformat() + "Z",
-    }
-    LESSON_ID_SEQ += 1
-    LESSONS.append(new_lesson)
-    return new_lesson
-
-@app.post("/instructor/lessons/upload")
-async def upload_lesson_no_path(
-    course_id: str = Form(...),
-    title: str = Form(...),
-    description: str = Form(""),
-    file: UploadFile = File(...),
-    _: bool = Depends(require_instructor)
-):
-    # Accept course_id as string and coerce to int with friendly errors
-    try:
-        cid = int(course_id)
-    except Exception:
-        raise HTTPException(status_code=400, detail="course_id must be an integer")
-    return await upload_lesson(cid, title=title, description=description, file=file)  # type: ignore

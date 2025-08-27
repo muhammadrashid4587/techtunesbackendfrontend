@@ -2,322 +2,455 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TechTunes • Lesson Island</title>
-  <link rel="stylesheet" href="css/mousetrail.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Tunes - Music Selection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-purple: #d49efb;
+      --accent-yellow: #fceabb;
+      --dark-purple: #4c1a80;
+      --teal: #003d4d;
+      --dark-bg: #0a0f0f;
+      --white: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      margin: 0;
-      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      width: 100vw;
       height: 100vh;
-      position: relative;
       overflow: hidden;
-      background-image:
-        url('images/Floor.png'),
-        url('images/Brick_Wall.png'),
-        url('images/Light.png');
-      background-size:
-        100%,
-        cover,
-        100%;
-      background-position:
-        bottom,
-        center,
-        top left;
-      background-repeat:
-        no-repeat,
-        no-repeat,
-        no-repeat;
-      background-attachment:
-        scroll;
+      background-image: url('images/Brick_Wall.png');
+      background-size: cover;
+      background-position: center;
+      position: relative;
     }
 
-
-
-    .topbar { position: absolute; top: 16px; left: 16px; z-index: 4; }
-    .back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      background: #ef09d0;
-      color: #0b0820;
-      text-decoration: none;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,0.35);
-      box-shadow:
-        0 6px 20px rgba(239, 9, 208, 0.45),
-        inset 0 0 0 1px rgba(255,255,255,0.15);
-      transition: transform 0.15s ease, filter 0.15s ease;
-    }
-    .back:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .back:focus-visible {
-      outline: 3px solid rgba(239, 9, 208, 0.8);
-      outline-offset: 2px;
+    /* ---- Layout ---- */
+    .jukebox-stage {
+      position: relative;         /* needed for absolute hitbox */
+      width: 100%;
+      height: 80vh;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 5vh;
+      z-index: 1;
     }
 
-    /* Selector UI */
-    .headline {
+    /* Enhanced title with simple glow */
+    .jukebox-title {
       position: absolute;
-      top: 18%;
+      top: 6vh;
       left: 50%;
       transform: translateX(-50%);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
       text-align: center;
       z-index: 3;
-    }
-    .headline .title {
-      margin: 0;
-      font-weight: 900;
-      font-size: clamp(28px, 6vw, 56px);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(90deg, #ffffff, #ef09d0, #7e5bef);
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow));
       -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       background-clip: text;
-      color: transparent;
-      text-shadow:
-        0 0 20px rgba(239, 9, 208, 0.35),
-        0 0 40px rgba(126, 91, 239, 0.25);
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+      text-shadow: 2px 2px 4px rgba(0,0,0,.6);
+      transition: all 0.3s ease;
     }
-    .headline .title::after {
-      content: '';
-      display: block;
-      width: 60%;
-      height: 3px;
-      margin: 8px auto 0;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(239,9,208,0.9) 0%, rgba(239,9,208,0.2) 60%, rgba(239,9,208,0) 70%);
-      box-shadow: 0 0 12px rgba(239,9,208,0.6);
+
+    .jukebox-title:hover {
+      transform: translateX(-50%) scale(1.05);
+      filter: drop-shadow(0 0 20px rgba(212, 158, 251, 0.6));
     }
-    .selector {
-      position: absolute;
-      left: 50%;
-      bottom: 30%;
-      transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      grid-auto-rows: auto;
-      align-items: center;
-      gap: 22px;
-      padding: 22px 24px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(0,0,0,0.35);
-      color: #fff;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+
+    .jukebox-wrap {
+      position: relative;         /* local context for hit areas */
+      width: min(92vw, 1200px);
       z-index: 2;
-      width: min(1040px, 94vw);
-      overflow: visible;
-    }
-    .selector::before {
-      content: '';
-      position: absolute;
-      inset: -12px;
-      border-radius: 24px;
-      background: linear-gradient(90deg, rgba(239,9,208,0.25), rgba(126,91,239,0.25));
-      filter: blur(20px);
-      z-index: -1;
-      pointer-events: none;
-    }
-    .selector::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: -18px;
-      transform: translateX(-50%);
-      width: 60%;
-      height: 6px;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(239,9,208,0.8) 0%, rgba(239,9,208,0.15) 60%, rgba(239,9,208,0) 70%);
-      box-shadow: 0 0 16px rgba(239,9,208,0.6);
-      pointer-events: none;
-    }
-    .arrow {
-      width: 64px; height: 64px;
-      display: grid; place-items: center;
-      border-radius: 50%; border: 1px solid rgba(255,255,255,0.25);
-      background: rgba(0,0,0,0.5); color: #fff;
       cursor: pointer;
-      transition: transform 0.15s ease, background 0.15s ease;
-      user-select: none;
-    }
-    .arrow:hover { transform: scale(1.05); background: rgba(0,0,0,0.6); }
-    .display {
-      display: grid;
-      grid-auto-rows: auto;
-      justify-items: center;
-      align-items: center;
-      text-align: center;
-      gap: 12px;
-    }
-    .icon { font-size: clamp(56px, 9vw, 96px); filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35)); }
-    .meta { display: grid; gap: 6px; justify-items: center; text-align: center; }
-    .name { font-size: clamp(26px, 5vw, 36px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-    .status { font-size: 14px; opacity: 0.9; }
-    .cta {
-      grid-column: 1 / -1;
-      justify-self: center;
-      margin-top: 6px;
-      padding: 14px 20px;
-      border-radius: 14px;
-      border: none;
-      font-weight: 800;
-      font-size: 1.05rem;
-      cursor: pointer;
-      background: #ef09d0; color: #0b0820;
-      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
-      text-decoration: none;
-    }
-    .cta:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .cta[aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
-
-    @media (max-width: 720px) {
-      .selector { grid-template-columns: 1fr; gap: 12px; text-align: center; bottom: 24%; }
-      .display { justify-content: center; }
-      .cta { justify-self: center; width: 100%; }
+      transition: all 0.3s ease;
     }
 
-    /* Floating musical symbols */
-    .floating-symbols {
+    .jukebox-wrap:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 15px 30px rgba(212, 158, 251, 0.3));
+    }
+
+    .jukebox-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+    }
+    
+    .jukebox-wrap:hover .jukebox-image {
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,.6)) brightness(1.1);
+    }
+    
+    .jukebox-wrap:active .jukebox-image,
+    .jukebox-image.clicking {
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,.6)) brightness(1.05);
+      transform: scale(0.98);
+    }
+
+    /* Enhanced clickable area with visual feedback */
+    .jukebox-hit {
       position: absolute;
+      left: 20%;      /* screen's left edge */
+      top: 32%;       /* screen's top edge */
+      width: 60%;     /* screen width */
+      height: 36%;    /* screen height */
+      display: block;
+      background: transparent;
+      z-index: 5;
+      outline: none;
+      transition: all 0.3s ease;
+      border-radius: 12px;
+    }
+    
+    .jukebox-wrap:hover .jukebox-hit {
+      background: rgba(212, 158, 251, 0.1);
+      box-shadow: inset 0 0 20px rgba(212, 158, 251, 0.2);
+    }
+    
+    .jukebox-hit:focus-visible {
+      box-shadow: 0 0 0 4px rgba(212, 158, 251, 0.55);
+      border-radius: 12px;
+      background: rgba(212, 158, 251, 0.15);
+    }
+
+    /* Optional: show where the screen is on hover for debugging
+       (comment out when you’re happy with alignment) */
+    .jukebox-wrap:hover .jukebox-hit {
+      /* background: rgba(0, 200, 255, .12); */
+    }
+
+    /* Enhanced floating music notes */
+    .music-notes {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
       z-index: 1;
+      overflow: hidden;
     }
-    .musical-symbol {
+
+    .music-note {
       position: absolute;
-      color: rgba(255,255,255,0.1);
+      color: var(--primary-purple);
       font-size: 2rem;
-      animation: float 15s linear infinite;
-      user-select: none;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite;
+      text-shadow: 0 0 10px rgba(212, 158, 251, 0.5);
     }
-    .musical-symbol:nth-child(odd) {
-      color: rgba(76,26,128,0.7);
+
+    .music-note:nth-child(1) {
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+      font-size: 1.5rem;
     }
-    .musical-symbol:nth-child(3n) {
-      color: rgba(0,61,77,0.6);
+
+    .music-note:nth-child(2) {
+      top: 20%;
+      right: 15%;
+      animation-delay: 1s;
+      font-size: 2.5rem;
     }
+
+    .music-note:nth-child(3) {
+      top: 60%;
+      left: 5%;
+      animation-delay: 2s;
+      font-size: 1.8rem;
+    }
+
+    .music-note:nth-child(4) {
+      top: 30%;
+      right: 25%;
+      animation-delay: 3s;
+      font-size: 2.2rem;
+    }
+
+    .music-note:nth-child(5) {
+      top: 70%;
+      right: 10%;
+      animation-delay: 4s;
+      font-size: 1.6rem;
+    }
+
+    .music-note:nth-child(6) {
+      top: 15%;
+      left: 30%;
+      animation-delay: 5s;
+      font-size: 2rem;
+    }
+
     @keyframes float {
-      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
-      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.3;
+      }
+      50% {
+        transform: translateY(-20px) rotate(10deg);
+        opacity: 0.6;
+      }
     }
-    .pulse { animation: float 15s linear infinite, pulse 3s ease-in-out infinite; }
-    .glow { text-shadow: 0 0 10px currentColor; }
+
+    /* Enhanced floor with subtle animation */
+    .floor-image {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .floor-image img { 
+      width: 100%; 
+      height: auto; 
+      display: block; 
+    }
+
+    /* Floating Background Music Notes (Snowflake Style) */
+    .bg-music-notes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-note {
+      position: absolute;
+      color: rgba(212, 158, 251, 0.4);
+      font-size: 1.5rem;
+      animation: fall linear infinite;
+      text-shadow: 0 0 5px rgba(212, 158, 251, 0.3);
+    }
+
+    .bg-note:nth-child(1) {
+      left: 10%;
+      animation-duration: 8s;
+      animation-delay: 0s;
+      font-size: 1.2rem;
+    }
+
+    .bg-note:nth-child(2) {
+      left: 20%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      font-size: 1.8rem;
+    }
+
+    .bg-note:nth-child(3) {
+      left: 30%;
+      animation-duration: 10s;
+      animation-delay: 4s;
+      font-size: 1.4rem;
+    }
+
+    .bg-note:nth-child(4) {
+      left: 40%;
+      animation-duration: 15s;
+      animation-delay: 1s;
+      font-size: 1.6rem;
+    }
+
+    .bg-note:nth-child(5) {
+      left: 50%;
+      animation-duration: 9s;
+      animation-delay: 3s;
+      font-size: 1.3rem;
+    }
+
+    .bg-note:nth-child(6) {
+      left: 60%;
+      animation-duration: 11s;
+      animation-delay: 5s;
+      font-size: 1.7rem;
+    }
+
+    .bg-note:nth-child(7) {
+      left: 70%;
+      animation-duration: 13s;
+      animation-delay: 2.5s;
+      font-size: 1.1rem;
+    }
+
+    .bg-note:nth-child(8) {
+      left: 80%;
+      animation-duration: 7s;
+      animation-delay: 1.5s;
+      font-size: 1.5rem;
+    }
+
+    .bg-note:nth-child(9) {
+      left: 90%;
+      animation-duration: 14s;
+      animation-delay: 0.5s;
+      font-size: 1.4rem;
+    }
+
+    .bg-note:nth-child(10) {
+      left: 15%;
+      animation-duration: 16s;
+      animation-delay: 6s;
+      font-size: 1.6rem;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Music note symbols for background */
+    .bg-note:nth-child(1)::before { content: '♪'; }
+    .bg-note:nth-child(2)::before { content: '♫'; }
+    .bg-note:nth-child(3)::before { content: '♩'; }
+    .bg-note:nth-child(4)::before { content: '♬'; }
+    .bg-note:nth-child(5)::before { content: '♭'; }
+    .bg-note:nth-child(6)::before { content: '♯'; }
+    .bg-note:nth-child(7)::before { content: '♪'; }
+    .bg-note:nth-child(8)::before { content: '♫'; }
+    .bg-note:nth-child(9)::before { content: '♩'; }
+    .bg-note:nth-child(10)::before { content: '♬'; }
   </style>
 </head>
 <body>
-  <div class="logo"></div>
-  <div class="topbar">
-    <a class="back" href="homepage.html">← Home</a>
-    <a class="back" href="instructor.html" style="margin-left:8px; background:#7e5bef; color:#fff;">Instructor</a>
-    <a class="back" href="admin.html" style="margin-left:8px; background:#7e5bef; color:#fff;">Admin</a>
+  <!-- Background Music Notes (Snowflake Style) -->
+  <div class="bg-music-notes">
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
+    <div class="bg-note"></div>
   </div>
-  <div class="headline"><h1 class="title">Choose your instrument</h1></div>
 
-  <div id="floating-symbols" class="floating-symbols"></div>
+  <!-- Floating Background Music Notes -->
+  <div class="music-notes">
+    <div class="music-note"></div>
+    <div class="music-note"></div>
+    <div class="music-note"></div>
+    <div class="music-note"></div>
+    <div class="music-note"></div>
+    <div class="music-note"></div>
+  </div>
 
-  <div class="selector" role="group" aria-label="Instrument selector">
-    <button class="arrow" id="prev" aria-label="Previous">‹</button>
-    <div class="display">
-      <div class="icon" id="icon">🎸</div>
-      <div class="meta">
-        <div class="name" id="name">Guitar</div>
-        <div class="status" id="status">Available</div>
-      </div>
+  <div class="jukebox-stage">
+    <h1 class="jukebox-title">Choose Your Musical Journey</h1>
+
+    <div class="jukebox-wrap" id="jukebox">
+      <img src="Jukebox_Page_Assets/Final_Jukebox_Transparent.png"
+           alt="Jukebox"
+           class="jukebox-image" />
+
+      <!-- Clickable screen: goes to the instrument selection page -->
+      <a href="lessons_instruments.html"
+         class="jukebox-hit"
+         aria-label="Open instrument selection"></a>
     </div>
-    <button class="arrow" id="next" aria-label="Next">›</button>
-    <a class="cta" id="cta" href="lessons_guitar.html">Enter</a>
   </div>
 
-  <script src="js/mousetrail.js"></script>
+  <div class="floor-image">
+    <img src="images/Floor.png" alt="Floor">
+  </div>
+
   <script>
-    const instruments = [
-      { name: 'Guitar', icon: '🎸', enabled: true, href: 'lessons_guitar.html' },
-      { name: 'Piano', icon: '🎹', enabled: false },
-      { name: 'Drums', icon: '🥁', enabled: false },
-      { name: 'Violin', icon: '🎻', enabled: false },
-    ];
-
-    let index = 0;
-    const iconEl = document.getElementById('icon');
-    const nameEl = document.getElementById('name');
-    const statusEl = document.getElementById('status');
-    const ctaEl = document.getElementById('cta');
-    const prevBtn = document.getElementById('prev');
-    const nextBtn = document.getElementById('next');
-
-    function update() {
-      const item = instruments[index];
-      iconEl.textContent = item.icon;
-      nameEl.textContent = item.name;
-      if (item.enabled) {
-        statusEl.textContent = 'Available';
-        ctaEl.textContent = 'Enter';
-        ctaEl.removeAttribute('aria-disabled');
-        ctaEl.setAttribute('href', item.href || '#');
-      } else {
-        statusEl.textContent = 'Coming soon';
-        ctaEl.textContent = 'Coming soon';
-        ctaEl.setAttribute('aria-disabled', 'true');
-        ctaEl.removeAttribute('href');
+    // Optional: minimal keyboard support for accessibility (Enter/Space on jukebox)
+    document.addEventListener('keydown', (e) => {
+      const jukebox = document.getElementById('jukebox');
+      if (!jukebox) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        jukebox.querySelector('.jukebox-hit').click();
       }
-    }
-
-    prevBtn.addEventListener('click', () => { index = (index - 1 + instruments.length) % instruments.length; update(); });
-    nextBtn.addEventListener('click', () => { index = (index + 1) % instruments.length; update(); });
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') prevBtn.click();
-      if (e.key === 'ArrowRight') nextBtn.click();
-      if (e.key === 'Enter' && !ctaEl.hasAttribute('aria-disabled') && ctaEl.getAttribute('href')) {
-        window.location.href = ctaEl.getAttribute('href');
-      }
-    });
-
-    update();
-
-    // Floating symbols
-    const symbols = ['♪','♫','♬','♭','♯','♩','♮','𝄞','𝄢'];
-    const floatContainer = document.getElementById('floating-symbols');
-    function createSymbol() {
-      const el = document.createElement('div');
-      el.className = 'musical-symbol';
-      if (Math.random() < 0.3) el.classList.add('pulse');
-      if (Math.random() < 0.2) el.classList.add('glow');
-      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-      el.style.left = Math.random() * 100 + '%';
-      el.style.fontSize = (Math.random() * 2 + 1) + 'rem';
-      el.style.animationDelay = Math.random() * 5 + 's';
-      el.style.animationDuration = (Math.random() * 10 + 10) + 's';
-      floatContainer.appendChild(el);
-      setTimeout(() => el.remove(), 20000);
-    }
-    for (let i = 0; i < 8; i++) setTimeout(createSymbol, i * 500);
-    setInterval(createSymbol, 2000);
-
-    document.addEventListener('mousemove', (e) => {
-      const syms = document.querySelectorAll('.musical-symbol');
-      const mx = e.clientX / window.innerWidth - 0.5;
-      const my = e.clientY / window.innerHeight - 0.5;
-      syms.forEach((sym, i) => {
-        const speed = (i % 3 + 1) * 0.5;
-        sym.style.transform = `translate(${mx * speed}px,${my * speed}px)`;
-      });
     });
   </script>
-</body>
+
+    <!-- Music notes following cursor -->
+    <script>
+      let mouseTrail = [];
+      const maxTrailLength = 8;
+
+      document.addEventListener('mousemove', (e) => {
+        // Create new music note at cursor position
+        const note = document.createElement('div');
+        note.className = 'cursor-music-note';
+        note.style.left = e.clientX + 'px';
+        note.style.top = e.clientY + 'px';
+        note.style.position = 'fixed';
+        note.style.pointerEvents = 'none';
+        note.style.zIndex = '9999';
+        note.style.color = '#d49efb';
+        note.style.fontSize = '1.2rem';
+        note.style.opacity = '0.8';
+        note.style.transition = 'all 0.3s ease';
+        note.style.textShadow = '0 0 8px rgba(212, 158, 251, 0.6)';
+        
+        // Random music note symbol
+        const symbols = ['♪', '♫', '♩', '♬', '♭', '♯'];
+        note.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        
+        document.body.appendChild(note);
+        
+        // Add to trail array
+        mouseTrail.push(note);
+        
+        // Limit trail length
+        if (mouseTrail.length > maxTrailLength) {
+          const oldNote = mouseTrail.shift();
+          if (oldNote && oldNote.parentNode) {
+            oldNote.parentNode.removeChild(oldNote);
+          }
+        }
+        
+        // Animate trail notes
+        mouseTrail.forEach((trailNote, index) => {
+          if (trailNote) {
+            const delay = index * 50;
+            setTimeout(() => {
+              trailNote.style.opacity = '0.6';
+              trailNote.style.transform = 'scale(0.8) rotate(' + (index * 15) + 'deg)';
+            }, delay);
+          }
+        });
+        
+        // Remove notes after animation
+        setTimeout(() => {
+          if (note.parentNode) {
+            note.style.opacity = '0';
+            note.style.transform = 'scale(0.5) rotate(180deg)';
+            setTimeout(() => {
+              if (note.parentNode) {
+                note.parentNode.removeChild(note);
+              }
+            }, 300);
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
 </html>

@@ -1,31 +1,34 @@
 /* css/mousetrail.css */
 
 :root {
-    --note-start: #3498db;   /* your brand/accent */
+    --note-start: #d49efb;   /* matching your theme color */
   }
   
   .music-note {
-    position: absolute;
+    position: fixed; /* Changed from absolute to fixed for better positioning */
     pointer-events: none;
-    font-size: 34px;
+    font-size: 24px; /* Reduced size for better performance */
     font-weight: bold;
     color: var(--note-start);
     user-select: none;
-    animation: float-up 0.5s forwards;
+    animation: float-up 0.5s ease-out forwards;
+    z-index: 9999; /* Ensure notes appear above everything */
+    text-shadow: 0 0 8px rgba(212, 158, 251, 0.6);
   }
   
   @keyframes float-up {
-    to {
-      transform: translateY(-20px);
+    0% {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-30px);
       opacity: 0;
-      /* fade color into the page background */
-      color: var(--page-bg);
     }
   }
   
-  
-  /* Change the cursor style site-wide */
-  body {
-    cursor: pointer;       /* you can also try crosshair, grab, move, etc. */
-  }
+  /* Remove the cursor change to keep default */
+  /* body {
+    cursor: pointer;
+  } */
   

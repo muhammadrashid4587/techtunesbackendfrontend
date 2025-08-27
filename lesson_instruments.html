@@ -34,25 +34,6 @@
       position: relative;
     }
 
-    /* Background horizontal lines */
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 20px,
-          rgba(255, 255, 255, 0.1) 20px,
-          rgba(255, 255, 255, 0.1) 22px
-        );
-      z-index: 1;
-    }
-
     /* Curved light blue overlays */
     body::after {
       content: '';
@@ -69,24 +50,32 @@
 
     /* Main container */
     .main-container {
-      position: relative;
       width: 100%;
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 3;
+      z-index: 6;
+      background-image: url("Jukebox_Page_Assets/JukeBox Option 2.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: relative;
     }
 
-    /* Islands container */
+    /* Islands container - Positioned to appear in the jukebox screen area */
     .islands-container {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 4rem;
-      margin-bottom: 3rem;
-      position: relative;
+      margin-bottom: 8rem;
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 7;
     }
 
     /* Island base styles */
@@ -107,6 +96,34 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
     }
 
+    .island.active {
+      transform: scale(1.1);
+      box-shadow: 0 20px 50px rgba(212, 158, 251, 0.4);
+      border: 3px solid #d49efb;
+    }
+
+    /* Navigation feedback */
+    .main-container.navigating {
+      animation: navigatePulse 0.3s ease;
+    }
+
+    @keyframes navigatePulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    /* Disabled button state */
+    .select-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .select-btn:disabled:hover {
+      transform: none;
+      box-shadow: 3px 3px 0 #1E3A8A, 1px 1px 0 #000;
+    }
+
     /* Guitar Island */
     .guitar-island {
       width: 280px;
@@ -114,7 +131,7 @@
       background: var(--guitar-color);
       border: 3px solid rgba(255, 255, 255, 0.3);
       position: relative;
-      z-index: 4;
+      z-index: 8;
     }
 
     .guitar-island.active {
@@ -129,7 +146,7 @@
       background: var(--piano-color);
       border: 3px solid rgba(255, 255, 255, 0.3);
       position: relative;
-      z-index: 3;
+      z-index: 8;
     }
 
     /* Island text */
@@ -189,77 +206,144 @@
       z-index: 5;
     }
 
-    /* Control buttons container */
+    /* Control buttons container - Positioned at the bottom of jukebox */
     .controls-container {
       display: flex;
       align-items: center;
       gap: 2rem;
-      z-index: 4;
+      z-index: 8;
+      position: absolute;
+      bottom: 25%;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
-    /* Arrow buttons */
+    /* Arrow buttons - Exact design from reference image */
     .nav-arrow {
-      width: 50px;
-      height: 50px;
+      width: 0;
+      height: 0;
       border: none;
-      background: var(--white);
-      border-radius: 50%;
+      background: transparent;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      border: 2px solid rgba(0, 0, 0, 0.1);
     }
 
-    .nav-arrow::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border: 8px solid transparent;
-      transform: translate(-50%, -50%);
+    .nav-arrow.left {
+      border-top: 20px solid transparent;
+      border-bottom: 20px solid transparent;
+      border-right: 30px solid #87CEEB;
+      filter: drop-shadow(3px 3px 0 #1E3A8A) drop-shadow(1px 1px 0 #000);
     }
 
-    .nav-arrow.left::before {
-      border-right: 8px solid #333;
-      margin-left: -2px;
-    }
-
-    .nav-arrow.right::before {
-      border-left: 8px solid #333;
-      margin-left: 2px;
+    .nav-arrow.right {
+      border-top: 20px solid transparent;
+      border-bottom: 20px solid transparent;
+      border-left: 30px solid #87CEEB;
+      filter: drop-shadow(-3px 3px 0 #1E3A8A) drop-shadow(-1px 1px 0 #000);
     }
 
     .nav-arrow:hover {
-      background: #f0f0f0;
       transform: scale(1.1);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     }
 
-    /* Select button */
+    /* Select button - Exact design from reference image */
     .select-btn {
-      background: linear-gradient(135deg, var(--button-blue), var(--button-cyan));
-      color: var(--white);
-      border: 2px solid rgba(0, 0, 0, 0.1);
-      border-radius: 25px;
-      padding: 1rem 3rem;
-      font-size: 1.4rem;
+      background: #87CEEB;
+      color: transparent;
+      border: 2px solid #000;
+      border-radius: 30px;
+      padding: 1.2rem 3.5rem;
+      font-size: 1.5rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
       font-family: inherit;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      min-height: 60px;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 3px 3px 0 #1E3A8A, 1px 1px 0 #000;
+    }
+
+    /* Layered text effect for SELECT button */
+    .select-btn::before {
+      content: 'SELECT';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #87CEEB;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-shadow: 1px 1px 0 #fff, -1px -1px 0 #1E3A8A;
+      z-index: 1;
     }
 
     .select-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 4px 4px 0 #1E3A8A, 2px 2px 0 #000;
     }
 
     .select-btn:active {
-      transform: translateY(0);
+      transform: translateY(1px);
+      box-shadow: 2px 2px 0 #1E3A8A, 0px 0px 0 #000;
+    }
+
+    .jukebox-wrap {
+      position: relative;         /* local context for hit areas */
+      width: min(92vw, 1200px);
+      z-index: 2;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .jukebox-wrap:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 15px 30px rgba(212, 158, 251, 0.3));
+    }
+
+    .jukebox-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+    }
+    
+    .jukebox-wrap:hover .jukebox-image {
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,.6)) brightness(1.1);
+    }
+    
+    .jukebox-wrap:active .jukebox-image,
+    .jukebox-image.clicking {
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,.6)) brightness(1.05);
+      transform: scale(0.98);
+    }
+
+    /* Enhanced title with simple glow */
+    .jukebox-title {
+      position: absolute;
+      top: 6vh;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      text-align: center;
+      z-index: 3;
+      background: linear-gradient(45deg, var(--primary-purple), var(--accent-yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 2px 2px 4px rgba(0,0,0,.6);
+      transition: all 0.3s ease;
+    }
+
+    .jukebox-title:hover {
+      transform: translateX(-50%) scale(1.05);
+      filter: drop-shadow(0 0 20px rgba(212, 158, 251, 0.6));
     }
 
     /* Responsive design */
@@ -350,6 +434,9 @@
         document.querySelector('.piano-island').classList.add('active');
         currentIsland = 1;
       }
+      
+      // Update button state based on selection
+      updateButtonState();
     }
     
     function navigateIsland(direction) {
@@ -359,6 +446,28 @@
         currentIsland = (currentIsland + 1) % islands.length;
       }
       selectIsland(islands[currentIsland]);
+      
+      // Add visual feedback
+      const jukebox = document.querySelector('.main-container');
+      jukebox.classList.add('navigating');
+      setTimeout(() => {
+        jukebox.classList.remove('navigating');
+      }, 300);
+    }
+    
+    function updateButtonState() {
+      const selectBtn = document.querySelector('.select-btn');
+      const selectedIsland = islands[currentIsland];
+      
+      if (selectedIsland === 'piano') {
+        selectBtn.textContent = 'COMING SOON';
+        selectBtn.style.background = '#ff6b6b';
+        selectBtn.disabled = true;
+      } else {
+        selectBtn.textContent = 'SELECT';
+        selectBtn.style.background = '#87CEEB';
+        selectBtn.disabled = false;
+      }
     }
     
     function confirmSelection() {
