@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/mousetrail.css">
   <link rel="stylesheet" href="css/pickbot.css">
-  
+  <link rel="stylesheet" href="css/chatbot.css">
   
   <nav class="main-nav">
     <a href="home.html">Home</a> |
@@ -74,10 +74,11 @@
 /* ─── arms styling ─── */
 .pickbot-arm {
   position: absolute;
-  width: 60px;      /* tweak to match your hand-png size */
+  width: 90px;      /* tweak to match your hand-png size */
   height: 80px;     /* tweak as needed */
   background-size: contain;
   background-repeat: no-repeat;
+  background-image: url("images/Choice Elements/Hands/Base Hands@4x.png");
 }
 .pickbot-arm.left {
   top: 50%;                    /* vertically centered */
@@ -136,10 +137,10 @@
     }
 
     .pickbot-image {
-      max-width: 180px;
+      max-width: 220px;
       height: auto;
       margin-bottom: 2rem;
-      animation: bounce 2s infinite;
+      top: 20%;
       filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
     }
 
@@ -283,6 +284,7 @@
       .bar {
         width: 10px;
       }
+      
     }
   </style>
 </head>
@@ -293,10 +295,6 @@
     <div class="loading-text">Loading...</div>
     
     <div class="loading-bars">
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
       <div class="bar"></div>
       <div class="bar"></div>
       <div class="bar"></div>
@@ -314,8 +312,7 @@
       <div class="dot"></div>
       <div class="dot"></div>
     </div>
-
-    <button class="continue-btn" onclick="window.location.href='homepage.html'">Continue</button>
+    <!-- Continue button removed -->
   </div>
 
   <script>
@@ -352,13 +349,51 @@
       pickbot.style.animationDuration = `${2 / bounceIntensity}s`;
     }, 2000);
 
-    // Simulate loading completion after 3 seconds
+    // Automatic redirect after 7 seconds
     setTimeout(() => {
-      document.querySelector('.continue-btn').style.display = 'inline-block';
-    }, 3000);
+      window.location.href = 'pricing.html';
+    }, 7000);
   </script>
   <script src="js/mousetrail.js"></script>
   <script src="js/pickbot.js"></script>
+
+   <!-- PickBot Chatbot -->
+<div class="pickbot-chatbot">
+    <button class="pickbot-toggle" id="pickbot-toggle">
+        <img src="images/PickBot1.png" alt="PickBot" class="pickbot-avatar">
+        <div class="pickbot-notification" id="pickbot-notification">1</div>
+    </button>
+    
+    <div class="pickbot-window" id="pickbot-window">
+        <div class="pickbot-header">
+            <div class="pickbot-header-content">
+                <h3>PickBot Assistant</h3>
+                <p>Smart • Helpful • Content Filtered</p>
+            </div>
+        </div>
+        
+        <div class="pickbot-messages" id="pickbot-messages">
+            <div class="pickbot-message bot">
+                <img src="images/PickBot1.png" alt="PickBot" class="pickbot-bot-avatar">
+                <div class="pickbot-message-content">
+                    Hi! I'm PickBot! I'm here to help you throughout your journey on this website. Ask me anything about guitars, music, or tech!
+                </div>
+            </div>
+        </div>
+        
+        <div class="pickbot-input-area">
+            <div class="pickbot-input-container">
+                <input type="text" 
+                       class="pickbot-input" 
+                       id="pickbot-input" 
+                       placeholder="Type your message..." 
+                       maxlength="500">
+                <button class="pickbot-send-btn" id="pickbot-send-btn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/chatbot.js"></script>
 
 </body>
 </html>

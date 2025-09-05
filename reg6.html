@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/mousetrail.css">
   <link rel="stylesheet" href="css/pickbot.css">
-  
+  <link rel="stylesheet" href="css/chatbot.css">
   
   <nav class="main-nav">
     <a href="index.html">Home</a> |
@@ -598,17 +598,6 @@
 
       <div class="goal-options">
         <div class="goal-option">
-          <input type="checkbox" name="goals" value="lesson-plan" id="lesson-plan"/>
-          <label for="lesson-plan" class="goal-label">
-            <div class="custom-checkbox">
-              <svg class="checkmark" viewBox="0 0 24 24">
-                <polyline points="20,6 9,17 4,12"></polyline>
-              </svg>
-            </div>
-            <div>A curated lesson plan</div>
-          </label>
-        </div>
-        <div class="goal-option">
           <input type="checkbox" name="goals" value="song-library" id="song-library"/>
           <label for="song-library" class="goal-label">
             <div class="custom-checkbox">
@@ -731,6 +720,44 @@
   </script>
   <script src="js/mousetrail.js"></script>
   <script src="js/pickbot.js"></script>
+
+ <!-- PickBot Chatbot -->
+<div class="pickbot-chatbot">
+    <button class="pickbot-toggle" id="pickbot-toggle">
+        <img src="images/PickBot1.png" alt="PickBot" class="pickbot-avatar">
+        <div class="pickbot-notification" id="pickbot-notification">1</div>
+    </button>
+    
+    <div class="pickbot-window" id="pickbot-window">
+        <div class="pickbot-header">
+            <div class="pickbot-header-content">
+                <h3>PickBot Assistant</h3>
+                <p>Smart • Helpful • Content Filtered</p>
+            </div>
+        </div>
+        
+        <div class="pickbot-messages" id="pickbot-messages">
+            <div class="pickbot-message bot">
+                <img src="images/PickBot1.png" alt="PickBot" class="pickbot-bot-avatar">
+                <div class="pickbot-message-content">
+                    Hi! I'm PickBot! I'm here to help you throughout your journey on this website. Ask me anything about guitars, music, or tech!
+                </div>
+            </div>
+        </div>
+        
+        <div class="pickbot-input-area">
+            <div class="pickbot-input-container">
+                <input type="text" 
+                       class="pickbot-input" 
+                       id="pickbot-input" 
+                       placeholder="Type your message..." 
+                       maxlength="500">
+                <button class="pickbot-send-btn" id="pickbot-send-btn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/chatbot.js"></script>
 
 
 </body>

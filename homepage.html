@@ -8,6 +8,8 @@
   <!-- Utility CSS (relative path) -->
   <link rel="stylesheet" href="css/mousetrail.css">
 
+  <link rel="stylesheet" href="css/chatbot.css">
+
   <style>
     /* ─── Body + Background Images ─── */
     body {
@@ -21,9 +23,9 @@
         url('images/Brick_Wall.png'),
         url('images/Light.png');
       background-size:
-        110% auto,
+        100%,
         cover,
-        110% auto;
+        100%;
       background-position:
         bottom,
         center,
@@ -112,12 +114,13 @@
       transform: translateX(-50%);
       width: 600px;
       height: 200px;
-      background-image: url('images/Title.png');
+      background-image: url('images/title.jpeg');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
       z-index: 2;
     }
+  
 
     /* ─── Cards ─── */
     .lesson-island,
@@ -135,29 +138,42 @@
       background-repeat: no-repeat;
       background-position: center;
     }
+    
 
     .lesson-island {
       position: absolute;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 500px;
-      height: 450px;
+      width: 330px;
+      height: 880px;
       background-image: url('images/LessonIsland.png');
       transform-origin: center bottom;
     }
+    .light {
+  position: absolute;
+  top: -15%;    /* adjust as needed */
+  left: 2%;   /* position next to impact */
+  width: 400px;
+  height: 400px;
+  background-image: url("images/Background/Lamp Dressing Room@4x.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5;  /* make sure it stays above other elements */
+}
+
     .tune-station {
       position: absolute;
-      bottom: 10%;
+      bottom: 20%;
       left: 5%;
-      width: 300px;
+      width: 800px;
       height: 300px;
       background-image: url('images/TuneStation.png');
       background-position: left;
     }
     .song-search {
       position: absolute;
-      bottom: 10%;
+      bottom: 20%;
       right: 5%;
       width: 300px;
       height: 300px;
@@ -166,8 +182,8 @@
     }
     .impact {
       position: absolute;
-      top: 10%;
-      left: 10%;
+      top: 15%;
+      left: 15%;
       width: 200px;
       height: 200px;
       background-image: url('images/Impact.png');
@@ -253,11 +269,13 @@
   <div class="lesson-island"></div>
   <div class="tune-station"></div>
   <div class="song-search"></div>
+
   <a href="guitar_tuner.html" class="tune-station"></a>
   <!-- PROFILE BANNER -->
   <a href="profile.html" class="profile"></a>
 
   <div class="impact"></div>
+  <div class="light"></div>
 
   <!-- FLOATING SYMBOLS CONTAINER -->
   <div id="floating-symbols" class="floating-symbols"></div>
@@ -302,5 +320,43 @@
   <!-- external scripts (relative paths) -->
   <script src="js/mousetrail.js"></script>
   <script src="js/auth.js"></script>
+
+   <!-- PickBot Chatbot -->
+<div class="pickbot-chatbot">
+    <button class="pickbot-toggle" id="pickbot-toggle">
+        <img src="images/PickBot1.png" alt="PickBot" class="pickbot-avatar">
+        <div class="pickbot-notification" id="pickbot-notification">1</div>
+    </button>
+    
+    <div class="pickbot-window" id="pickbot-window">
+        <div class="pickbot-header">
+            <div class="pickbot-header-content">
+                <h3>PickBot Assistant</h3>
+                <p>Smart • Helpful • Content Filtered</p>
+            </div>
+        </div>
+        
+        <div class="pickbot-messages" id="pickbot-messages">
+            <div class="pickbot-message bot">
+                <img src="images/PickBot1.png" alt="PickBot" class="pickbot-bot-avatar">
+                <div class="pickbot-message-content">
+                    Hi! I'm PickBot! I'm here to help you throughout your journey on this website. Ask me anything about guitars, music, or tech!
+                </div>
+            </div>
+        </div>
+        
+        <div class="pickbot-input-area">
+            <div class="pickbot-input-container">
+                <input type="text" 
+                       class="pickbot-input" 
+                       id="pickbot-input" 
+                       placeholder="Type your message..." 
+                       maxlength="500">
+                <button class="pickbot-send-btn" id="pickbot-send-btn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/chatbot.js"></script>
 </body>
 </html>

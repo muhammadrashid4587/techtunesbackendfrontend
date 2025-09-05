@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Avatar Creator • TechTunes</title>
   <link rel="stylesheet" href="css/profile.css" />
+  
+      <!-- Chatbot Component -->
+  <link rel="stylesheet" href="css/chatbot.css">
 
   <style>
     body {
@@ -355,6 +358,46 @@
         spin();
       }
     });
+    
   </script>
+
+   <!-- PickBot Chatbot -->
+<div class="pickbot-chatbot">
+    <button class="pickbot-toggle" id="pickbot-toggle">
+        <img src="images/PickBot1.png" alt="PickBot" class="pickbot-avatar">
+        <div class="pickbot-notification" id="pickbot-notification">1</div>
+    </button>
+    
+    <div class="pickbot-window" id="pickbot-window">
+        <div class="pickbot-header">
+            <div class="pickbot-header-content">
+                <h3>PickBot Assistant</h3>
+                <p>Smart • Helpful • Content Filtered</p>
+            </div>
+        </div>
+        
+        <div class="pickbot-messages" id="pickbot-messages">
+            <div class="pickbot-message bot">
+                <img src="images/PickBot1.png" alt="PickBot" class="pickbot-bot-avatar">
+                <div class="pickbot-message-content">
+                    Hi! I'm PickBot! I'm here to help you throughout your journey on this website. Ask me anything about guitars, music, or tech!
+                </div>
+            </div>
+        </div>
+        
+        <div class="pickbot-input-area">
+            <div class="pickbot-input-container">
+                <input type="text" 
+                       class="pickbot-input" 
+                       id="pickbot-input" 
+                       placeholder="Type your message..." 
+                       maxlength="500">
+                <button class="pickbot-send-btn" id="pickbot-send-btn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/chatbot.js"></script>
+
 </body>
 </html>

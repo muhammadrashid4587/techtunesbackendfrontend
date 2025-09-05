@@ -16,6 +16,8 @@
     rel="stylesheet"
   />
 
+  <link rel="stylesheet" href="css/chatbot.css">
+
   <!-- Anime.js for avatar animation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   <!-- Auth (inject avatar into nav globally) -->
@@ -51,10 +53,10 @@
         <option>Saxophone</option>
       </select>
 
-      <label for="avatar-color">Avatar Color:</label>
-      <input type="color" id="avatar-color" value="#d49efb">
+      
+      
 
-      <button type="submit">Save Profile</button>
+     
     </form>
 
     <!-- Link to full-page avatar editor -->
@@ -65,8 +67,9 @@
       <h3>Your Avatar</h3>
       <img
         id="avatar-preview"
+        class="avatar-preview" 
         alt="Your avatar"
-        style="max-width:200px; border:2px solid #fff; display:block; margin:0 auto;"
+        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEF2YXRhciBZZXQ8L3RleHQ+PC9zdmc+"
       />
     </div>
   </main>
@@ -77,11 +80,70 @@
   <!-- load saved avatar if it exists -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const avatarPreview = document.getElementById('avatar-preview');
       const data = localStorage.getItem('savedAvatar');
-      if (data) {
-        document.getElementById('avatar-preview').src = data;
+      
+      if (data && data.startsWith('data:image')) {
+        avatarPreview.src = data;
+        console.log('Avatar loaded from localStorage');
+      } else {
+        console.log('No saved avatar found in localStorage');
+      }
+      
+      // Also load profile data if available
+      const profileData = localStorage.getItem('technoProfile');
+      if (profileData) {
+        try {
+          const profile = JSON.parse(profileData);
+          const nameInput = document.getElementById('profile-name');
+          const instSelect = document.getElementById('favorite-instrument');
+          
+          if (profile.name) nameInput.value = profile.name;
+          if (profile.inst) instSelect.value = profile.inst;
+        } catch (e) {
+          console.error('Error loading profile data:', e);
+        }
       }
     });
   </script>
+
+   <!-- PickBot Chatbot -->
+<div class="pickbot-chatbot">
+    <button class="pickbot-toggle" id="pickbot-toggle">
+        <img src="images/PickBot1.png" alt="PickBot" class="pickbot-avatar">
+        <div class="pickbot-notification" id="pickbot-notification">1</div>
+    </button>
+    
+    <div class="pickbot-window" id="pickbot-window">
+        <div class="pickbot-header">
+            <div class="pickbot-header-content">
+                <h3>PickBot Assistant</h3>
+                <p>Smart • Helpful • Content Filtered</p>
+            </div>
+        </div>
+        
+        <div class="pickbot-messages" id="pickbot-messages">
+            <div class="pickbot-message bot">
+                <img src="images/PickBot1.png" alt="PickBot" class="pickbot-bot-avatar">
+                <div class="pickbot-message-content">
+                    Hi! I'm PickBot! I'm here to help you throughout your journey on this website. Ask me anything about guitars, music, or tech!
+                </div>
+            </div>
+        </div>
+        
+        <div class="pickbot-input-area">
+            <div class="pickbot-input-container">
+                <input type="text" 
+                       class="pickbot-input" 
+                       id="pickbot-input" 
+                       placeholder="Type your message..." 
+                       maxlength="500">
+                <button class="pickbot-send-btn" id="pickbot-send-btn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/chatbot.js"></script>
+
 </body>
 </html>
