@@ -1,0 +1,350 @@
+:root {
+  --primary-purple: #9300fc;
+  --dark-purple:   #4c1a80;
+  --teal:          #003d4d;
+  --white:         #ffffff;
+  --light-gray:    #cccccc;
+  --transition:    0.3s ease;
+  --border-radius: 8px;
+  --border-width:  2px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(45deg, #0a0f0f, var(--dark-purple), var(--teal));
+  background-size: 200% 200%;
+  background-image: url("/images/Brick_Wall.png");
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4rem;
+  color: var(--white);
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% 80%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 80%; }
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  padding: 0;
+  margin: 0 0 2rem;
+}
+nav ul li a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  transition: var(--transition);
+}
+nav ul li a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0; height: 2px;
+  background: var(--white);
+  transition: var(--transition);
+}
+nav ul li a:hover::after {
+  width: 100%;
+}
+
+#profile-container {
+  width: 90%;
+  max-width: 480px;
+  padding: 2rem;
+  background: rgba(10, 15, 15, 0.85);
+  border-radius: var(--border-radius);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+  margin: 0 auto;
+}
+
+/* Center the main heading */
+#profile-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-purple), var(--white));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+#profile-form label {
+  display: block;
+  margin: 1rem 0 .5rem;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+#profile-form input,
+#profile-form select,
+#profile-form button {
+  width: 100%;
+  padding: .8rem 1rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid rgba(212, 158, 251, 0.3);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: rgba(10, 15, 15, 0.6);
+  color: var(--white);
+  transition: all 0.3s ease;
+}
+
+#profile-form input:focus,
+#profile-form select:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(212, 158, 251, 0.2);
+  background: rgba(10, 15, 15, 0.8);
+}
+
+#profile-form input:hover,
+#profile-form select:hover {
+  border-color: var(--primary-purple);
+  background: rgba(10, 15, 15, 0.7);
+}
+
+/* Style the select dropdown arrow */
+#profile-form select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d49efb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+#profile-form button {
+  background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+  color: var(--white);
+  cursor: pointer;
+  font-weight: bold;
+  transition: var(--transition);
+}
+#profile-form button:hover {
+  opacity: 0.9;
+}
+
+
+/* Fancy Customize Avatar Button */
+#edit-avatar-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 2rem auto;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple), var(--teal));
+  background-size: 200% 200%;
+  color: var(--white);
+  text-decoration: none;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  border: none;
+  box-shadow: 0 8px 25px rgba(212, 158, 251, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+#edit-avatar-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+#edit-avatar-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(212, 158, 251, 0.6);
+  background-position: 100% 100%;
+}
+
+#edit-avatar-btn:hover::before {
+  left: 100%;
+}
+
+#edit-avatar-btn:active {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 6px 20px rgba(212, 158, 251, 0.5);
+}
+
+/* Add a subtle animation to the button */
+@keyframes buttonGlow {
+  0%, 100% { box-shadow: 0 8px 25px rgba(212, 158, 251, 0.4); }
+  50% { box-shadow: 0 8px 25px rgba(212, 158, 251, 0.6), 0 0 20px rgba(212, 158, 251, 0.3); }
+}
+
+#edit-avatar-btn {
+  animation: buttonGlow 3s ease-in-out infinite;
+}
+
+#preview {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Avatar preview styling */
+#avatar-preview-container {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+#avatar-preview-container h3 {
+  color: var(--white);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+#avatar-preview {
+  max-width: 200px;
+  border: 2px solid var(--primary-purple);
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+  min-height: 200px;
+  background: rgba(10, 15, 15, 0.6);
+  transition: all 0.3s ease;
+}
+
+#avatar-preview:hover {
+  border-color: var(--white);
+  box-shadow: 0 0 15px rgba(212, 158, 251, 0.3);
+}
+
+/* -------------------------------
+   Avatar preview & layering
+---------------------------------*/
+ /* Avatar preview: center each layer & preserve its natural aspect-ratio */
+ #avatar-preview {
+  position: relative;
+  width: 200px;      /* or whatever your desired container width */
+  height: 260px;     /* match the tallest art layer */
+margin: 1rem auto;
+  background: var(--avatar-color, rgba(255,255,255,0.1));
+  border-radius: 8px; /* soften corners */
+  overflow: hidden;   /* clip anything outside */
+}
+#avatar-preview img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 100%;
+  max-height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Editor controls */
+#avatar-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+
+}
+#avatar-editor label {
+  display: flex;
+  flex-direction: column;
+  color: var(--white);
+}
+#avatar-editor select {
+  margin-top: .25rem;
+  padding: .3rem;
+  border-radius: 4px;
+}
+
+/* Greeting & instrument text */
+#greeting,
+#instrument-display {
+  margin: .5rem 0;
+  font-weight: 600;
+}
+
+
+/* ─── pickbot.css ─── */
+
+/* wrapper around your img.pickbot-image */
+.pickbot-character {
+  position: relative;
+  display: inline-block;
+}
+
+/* just in case */
+.pickbot-character .pickbot-image {
+  display: block;
+}
+
+/* ─── shared pop-in keyframes ─── */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ─── ARMS (you already have these) ─── */
+.pickbot-arm {
+  position: absolute;
+  top: 50%;
+  width: 205px;    /* tweak as needed */
+  height: 590px;   /* tweak as needed */
+  background-size: contain;
+  background-repeat: no-repeat;
+
+  transform-origin: center center;
+  transform: translateY(-50%) scale(0);
+  opacity: 0;
+  animation: popIn 0.8s ease 0.4s both;
+}
+.pickbot-arm.left {
+  left: 1px;
+  background-image: url("/images/Choice Elements/Hands/Base Hands@4x.png");
+}
+.pickbot-arm.right {
+  /* if you still want to hide the right arm: */
+  display: none !important;
+  /* otherwise use:
+  right: -25px;
+  transform: translateY(-50%) scaleX(-1) scale(0);
+  background-image: url("/images/Choice Elements/Hands/Base Hands@4x.png");
+  */
+}
+#avatar-base {
+  position: absolute;
+  bottom: 200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 300px; /* Adjust to match your Pickbot */
+  z-index: 4;
+  background: url('/images/newpickbotttt.png') center/contain no-repeat;
+  -webkit-mask-image: url('/images/newpickbotttt.png'); /* Safari */
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: url('/images/newpickbotttt.png'); /* Other browsers */
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  background-color: #fff; /* Will change dynamically with JS */
+}

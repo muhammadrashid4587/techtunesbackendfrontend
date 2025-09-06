@@ -1,0 +1,27 @@
+/* Arms overlay - base styles; JS will size/position */
+.pickbot-arm {
+  position: absolute;
+  width: 65px;
+  height: 85px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+  z-index: 2;
+}
+
+.pickbot-arm.left {
+  top: 45%;
+  left:22px;
+  transform-origin: 80% 18%;
+  background-image: url("/images/Choice Elements/Hands/Base Hands@4x.png");
+  transform: translateY(-50%);
+}
+
+.pickbot-arm.right {
+  top: 45%;
+  right: -22px;
+  transform-origin: 20% 18%;
+  background-image: url("/images/Choice Elements/Hands/Base Hands@4x.png");
+  transform: translateY(-50%);
+}
